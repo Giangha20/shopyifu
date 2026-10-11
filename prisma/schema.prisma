@@ -785,3 +785,19 @@ model AuditLog {
   @@index([createdAt])
   @@map("audit_logs")
 }
+
+// ========================================
+// UPLOADED FILES (STORAGE FOR VERCEL & SERVERLESS)
+// ========================================
+
+model UploadedFile {
+  id        String   @id @default(cuid())
+  filename  String   @unique
+  mimeType  String   @map("mime_type")
+  size      Int
+  data      Bytes
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([filename])
+  @@map("uploaded_files")
+}

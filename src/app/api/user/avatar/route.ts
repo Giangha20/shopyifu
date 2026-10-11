@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, logAudit } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
-import crypto from 'crypto';
-
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+import { saveUploadedFile, validateFile } from '@/lib/upload';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,16 +17,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+    const validation = validateFile(file);
+    if (!validation.valid) {
       return NextResponse.json(
-        { error: 'Định dạng tệp không được hỗ trợ. Vui lòng chọn JPG, PNG, WEBP hoặc GIF.' },
-        { status: 400 }
-      );
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: 'Dung lượng ảnh đại diện vượt quá 5MB' },
+        { error: validation.error || 'Định dạng tệp không hợp lệ' },
         { status: 400 }
       );
     }
@@ -39,16 +28,9 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const ext = path.extname(file.name) || `.${file.type.split('/')[1]}`;
-    const filename = `avatar-${session.userId}-${Date.now()}-${crypto.randomBytes(4).toString('hex')}${ext}`;
-
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    await mkdir(uploadDir, { recursive: true });
-
-    const filePath = path.join(uploadDir, filename);
-    await writeFile(filePath, buffer);
-
-    const publicUrl = `/uploads/${filename}`;
+    // Save to DB and disk with Sharp optimization
+    const result = await saveUploadedFile(buffer, file.name, file.type);
+    const publicUrl = result.url;
 
     const updatedUser = await prisma.user.update({
       where: { id: session.userId },

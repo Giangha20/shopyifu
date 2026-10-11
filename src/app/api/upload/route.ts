@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, logAudit } from '@/lib/auth';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
-import crypto from 'crypto';
-
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+import { saveUploadedFile, validateFile } from '@/lib/upload';
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,16 +16,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+    const validation = validateFile(file);
+    if (!validation.valid) {
       return NextResponse.json(
-        { error: 'Định dạng tệp không được hỗ trợ. Chỉ chấp nhận JPG, PNG, WEBP, GIF, SVG.' },
-        { status: 400 }
-      );
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: 'Dung lượng tệp vượt quá giới hạn cho phép (tối đa 5MB)' },
+        { error: validation.error || 'Tệp tải lên không hợp lệ' },
         { status: 400 }
       );
     }
@@ -38,34 +27,25 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Generate unique file name
-    const ext = path.extname(file.name) || `.${file.type.split('/')[1]}`;
-    const filename = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}${ext}`;
-
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    await mkdir(uploadDir, { recursive: true });
-
-    const filePath = path.join(uploadDir, filename);
-    await writeFile(filePath, buffer);
-
-    const publicUrl = `/uploads/${filename}`;
+    // Persist to NeonDB + local disk with auto Sharp optimization
+    const result = await saveUploadedFile(buffer, file.name, file.type);
 
     await logAudit(
       session.userId,
       'upload_file',
       'media',
-      filename,
-      { originalName: file.name, size: file.size, mimeType: file.type },
+      result.filename,
+      { originalName: file.name, size: result.size, mimeType: result.mimeType },
       request
     );
 
     return NextResponse.json(
       {
         message: 'Tải lên hình ảnh thành công',
-        url: publicUrl,
-        filename,
-        size: file.size,
-        type: file.type,
+        url: result.url,
+        filename: result.filename,
+        size: result.size,
+        type: result.mimeType,
       },
       { status: 201 }
     );
@@ -75,7 +55,9 @@ export async function POST(request: NextRequest) {
     }
     console.error('Upload error:', error);
     return NextResponse.json(
-      { error: 'Đã có lỗi xảy ra khi tải lên tệp' },
+      {
+        error: error instanceof Error ? error.message : 'Đã có lỗi xảy ra khi tải lên tệp',
+      },
       { status: 500 }
     );
   }
