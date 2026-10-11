@@ -92,6 +92,16 @@ export async function PATCH(
       const updatePayload: Record<string, unknown> = {};
       if (data.firstName) updatePayload.firstName = data.firstName.trim();
       if (data.lastName) updatePayload.lastName = data.lastName.trim();
+      if (data.email) {
+        const cleanEmail = data.email.trim().toLowerCase();
+        if (cleanEmail !== existingStaff.email) {
+          const emailExists = await tx.user.findUnique({ where: { email: cleanEmail } });
+          if (emailExists) {
+            throw new Error('EMAIL_EXISTS');
+          }
+          updatePayload.email = cleanEmail;
+        }
+      }
       if (data.phone !== undefined) updatePayload.phone = data.phone;
       if (data.isActive !== undefined) updatePayload.isActive = data.isActive;
       if (data.password) {
@@ -135,6 +145,9 @@ export async function PATCH(
   } catch (error) {
     if (error instanceof Error && error.message === 'FORBIDDEN') {
       return NextResponse.json({ error: 'Không có quyền truy cập' }, { status: 403 });
+    }
+    if (error instanceof Error && error.message === 'EMAIL_EXISTS') {
+      return NextResponse.json({ error: 'Email này đã được sử dụng bởi tài khoản khác' }, { status: 400 });
     }
     console.error('Admin update staff error:', error);
     return NextResponse.json(

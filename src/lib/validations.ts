@@ -311,6 +311,7 @@ export const staffCreateSchema = z.object({
 export const staffUpdateSchema = z.object({
   firstName: z.string().min(1, 'Vui lòng nhập họ').optional(),
   lastName: z.string().min(1, 'Vui lòng nhập tên').optional(),
+  email: z.string().email('Email không hợp lệ').optional(),
   phone: z.string().optional(),
   isActive: z.boolean().optional(),
   roleIds: z.array(z.string()).optional(),
