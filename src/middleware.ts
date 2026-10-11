@@ -68,7 +68,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // 2. Rate limiting check (Exclude static and next internals)
-  const rateLimitResult = applyRateLimit(ip, 120, 60000);
+  const maxLimit = pathname.startsWith('/api/upload') ? 1000 : 600;
+  const rateLimitResult = applyRateLimit(ip, maxLimit, 60000);
   if (!rateLimitResult.success && pathname.startsWith('/api')) {
     return NextResponse.json(
       { error: 'Quá nhiều yêu cầu. Vui lòng thử lại sau.' },
@@ -76,7 +77,7 @@ export async function middleware(request: NextRequest) {
         status: 429,
         headers: {
           'Retry-After': Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString(),
-          'X-RateLimit-Limit': '120',
+          'X-RateLimit-Limit': maxLimit.toString(),
           'X-RateLimit-Remaining': '0',
           'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
         },
