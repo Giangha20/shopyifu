@@ -112,3 +112,38 @@ export async function PUT(
 }
 
 export const PATCH = PUT;
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await requireAdmin();
+
+    const existing = await prisma.order.findUnique({ where: { id: params.id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Không tìm thấy đơn hàng' }, { status: 404 });
+    }
+
+    await prisma.$transaction([
+      prisma.orderItem.deleteMany({ where: { orderId: params.id } }),
+      prisma.orderStatusHistory.deleteMany({ where: { orderId: params.id } }),
+      prisma.payment.deleteMany({ where: { orderId: params.id } }),
+      prisma.order.delete({ where: { id: params.id } }),
+    ]);
+
+    await logAudit(
+      session.userId,
+      'delete_order',
+      'order',
+      params.id,
+      { orderNumber: existing.orderNumber },
+      request
+    );
+
+    return NextResponse.json({ message: 'Xóa đơn hàng thành công' });
+  } catch (error) {
+    console.error('Delete order error:', error);
+    return NextResponse.json({ error: 'Lỗi khi xóa đơn hàng' }, { status: 500 });
+  }
+}

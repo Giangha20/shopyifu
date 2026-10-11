@@ -18,6 +18,7 @@ import {
   QrCode,
   Copy,
   ExternalLink,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -92,6 +93,20 @@ export default function OrderDetailPage() {
     }
   };
 
+  const handleDeleteOrder = async () => {
+    if (!confirm(`Bạn có chắc chắn muốn xóa vĩnh viễn đơn hàng #${order.orderNumber}? Hành động này không thể hoàn tác.`)) return;
+
+    try {
+      const res = await fetch(`/api/admin/orders/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lỗi khi xóa đơn hàng');
+      alert(data.message || 'Đã xóa đơn hàng thành công');
+      router.push('/admin/don-hang');
+    } catch (err: any) {
+      alert(err.message || 'Lỗi khi xóa');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex h-96 flex-col items-center justify-center gap-3">
@@ -140,14 +155,26 @@ export default function OrderDetailPage() {
           </div>
         </div>
 
-        <Button
-          variant="outline"
-          onClick={() => window.print()}
-          className="self-start sm:self-auto gap-2"
-        >
-          <Printer className="h-4 w-4" />
-          In hóa đơn
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => window.print()}
+            className="gap-2"
+          >
+            <Printer className="h-4 w-4" />
+            In hóa đơn
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={handleDeleteOrder}
+            className="gap-1.5 border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+            title="Xóa đơn hàng"
+          >
+            <Trash2 className="h-4 w-4" />
+            Xóa đơn
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

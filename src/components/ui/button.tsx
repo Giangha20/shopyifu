@@ -11,6 +11,8 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
+        default:
+          'bg-luxury-black text-white hover:bg-luxury-black-light hover:shadow-luxury-lg',
         primary:
           'bg-luxury-black text-white hover:bg-luxury-black-light hover:shadow-luxury-lg',
         gold:
