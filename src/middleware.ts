@@ -9,37 +9,7 @@ const JWT_SECRET = new TextEncoder().encode(
 const SESSION_COOKIE = 'luxe-session';
 const ADMIN_SESSION_COOKIE = 'luxe-admin-session';
 
-// In-memory rate limiting map for middleware edge execution
-const ipRequests = new Map<string, { count: number; resetTime: number }>();
 
-function applyRateLimit(ip: string, limit: number = 120, windowMs: number = 60000) {
-  const now = Date.now();
-  const record = ipRequests.get(ip);
-
-  if (!record || now > record.resetTime) {
-    ipRequests.set(ip, { count: 1, resetTime: now + windowMs });
-    return { success: true, remaining: limit - 1, resetTime: now + windowMs };
-  }
-
-  if (record.count >= limit) {
-    return { success: false, remaining: 0, resetTime: record.resetTime };
-  }
-
-  record.count += 1;
-  return { success: true, remaining: limit - record.count, resetTime: record.resetTime };
-}
-
-// Clean up stale rate limit entries periodically
-if (typeof setInterval !== 'undefined') {
-  setInterval(() => {
-    const now = Date.now();
-    ipRequests.forEach((val, key) => {
-      if (now > val.resetTime) {
-        ipRequests.delete(key);
-      }
-    });
-  }, 60000);
-}
 
 async function verifyEdgeToken(token: string) {
   try {
@@ -67,23 +37,7 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  // 2. Rate limiting check (Exclude static and next internals)
-  const maxLimit = pathname.startsWith('/api/upload') ? 1000 : 600;
-  const rateLimitResult = applyRateLimit(ip, maxLimit, 60000);
-  if (!rateLimitResult.success && pathname.startsWith('/api')) {
-    return NextResponse.json(
-      { error: 'Quá nhiều yêu cầu. Vui lòng thử lại sau.' },
-      {
-        status: 429,
-        headers: {
-          'Retry-After': Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString(),
-          'X-RateLimit-Limit': maxLimit.toString(),
-          'X-RateLimit-Remaining': '0',
-          'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
-        },
-      }
-    );
-  }
+
 
   // 3. Admin Routes Protection: /admin/*
   if (pathname.startsWith('/admin')) {
@@ -155,10 +109,6 @@ export async function middleware(request: NextRequest) {
     'camera=(), microphone=(), geolocation=(), browsing-topics=()'
   );
 
-  // Rate limit response headers
-  response.headers.set('X-RateLimit-Limit', '120');
-  response.headers.set('X-RateLimit-Remaining', Math.max(0, rateLimitResult.remaining).toString());
-  response.headers.set('X-RateLimit-Reset', rateLimitResult.resetTime.toString());
 
   // CORS headers for API routes
   if (pathname.startsWith('/api')) {
