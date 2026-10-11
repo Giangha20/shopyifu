@@ -23,27 +23,9 @@ interface CartStore {
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
-      items: [
-        // Preload with 1 item for a lively initial cart experience if empty
-        {
-          id: 'init-cart-1',
-          productId: 'prod-1',
-          variantId: 'var-1-1',
-          name: 'Đầm Lụa Tơ Tằm Thắt Eo Hoàng Gia',
-          slug: 'dam-lua-to-tam-that-eo-hoang-gia',
-          sku: 'LXS-DRS-001-CH-S',
-          image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80',
-          price: 3850000,
-          compareAtPrice: 4800000,
-          quantity: 1,
-          variantName: 'Champagne / S',
-          color: 'Champagne',
-          size: 'S',
-          stock: 8,
-        },
-      ],
+      items: [],
       coupon: null,
-      shippingFee: 0, // Free shipping for luxury orders >= 2.000.000d
+      shippingFee: 0,
 
       addItem: (newItem) => {
         set((state) => {
@@ -135,12 +117,31 @@ export const useCartStore = create<CartStore>()(
       },
     }),
     {
-      name: 'luxe_cart_store',
-      storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : {
-        getItem: () => null,
-        setItem: () => {},
-        removeItem: () => {},
-      })),
+      name: 'luxe_cart_store_v2',
+      storage: createJSONStorage(() => {
+        if (typeof window !== 'undefined') {
+          try {
+            // Clean up legacy store key that had the dummy item
+            localStorage.removeItem('luxe_cart_store');
+          } catch {
+            // ignore
+          }
+          return localStorage;
+        }
+        return {
+          getItem: () => null,
+          setItem: () => {},
+          removeItem: () => {},
+        };
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (state && Array.isArray(state.items)) {
+          // Extra safeguard: remove any legacy mock items
+          state.items = state.items.filter(
+            (item) => item.id !== 'init-cart-1' && item.productId !== 'prod-1'
+          );
+        }
+      },
     }
   )
 );
