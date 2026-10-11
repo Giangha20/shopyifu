@@ -144,7 +144,7 @@ export async function PATCH(
         compareAtPrice: data.compareAtPrice !== undefined ? (data.compareAtPrice ? new Prisma.Decimal(data.compareAtPrice) : null) : undefined,
         costPrice: data.costPrice !== undefined ? (data.costPrice ? new Prisma.Decimal(data.costPrice) : null) : undefined,
         quantity: data.quantity,
-        lowStockThreshold: data.lowStockThreshold,
+        lowStockThreshold: data.lowStockThreshold ?? undefined,
         weight: data.weight !== undefined ? (data.weight ? new Prisma.Decimal(data.weight) : null) : undefined,
         brand: data.brand,
         tags: data.tags,

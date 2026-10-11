@@ -48,7 +48,9 @@ export function ProductForm({ initialData, productId }: ProductFormProps) {
   );
   const [brand, setBrand] = useState(initialData?.brand || 'LUXE');
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>(
-    initialData?.categoryIds || []
+    initialData?.categoryIds ||
+      initialData?.categories?.map((c: any) => c.categoryId || c.id) ||
+      []
   );
 
   // Status flags
@@ -206,25 +208,31 @@ export function ProductForm({ initialData, productId }: ProductFormProps) {
       setLoading(true);
 
       const payload = {
-        name,
-        sku,
-        shortDescription,
-        description,
-        price: Number(price),
+        name: name.trim(),
+        sku: sku.trim(),
+        shortDescription: shortDescription?.trim() || null,
+        description: description?.trim() || null,
+        price: Number(price) || 0,
         compareAtPrice: compareAtPrice ? Number(compareAtPrice) : null,
         costPrice: costPrice ? Number(costPrice) : null,
         quantity: Number(quantity) || 0,
         lowStockThreshold: Number(lowStockThreshold) || 5,
-        brand,
+        brand: brand?.trim() || 'LUXE',
         isActive,
         isFeatured,
         isNew,
         isBestseller,
-        metaTitle: metaTitle || name,
-        metaDescription: metaDescription || shortDescription,
+        metaTitle: (metaTitle || name)?.trim().slice(0, 255) || null,
+        metaDescription: (metaDescription || shortDescription)?.trim().slice(0, 500) || null,
         categoryIds: selectedCategoryIds,
         images,
-        variants,
+        variants: variants.map((v: any, idx: number) => ({
+          ...v,
+          name: v.name?.trim() || `Phiên bản ${idx + 1}`,
+          sku: v.sku?.trim() || `${sku.trim()}-${idx + 1}`,
+          price: v.price !== '' && v.price !== null && v.price !== undefined ? Number(v.price) : null,
+          quantity: Number(v.quantity) || 0,
+        })),
       };
 
       const url = isEdit ? `/api/admin/products/${productId}` : '/api/admin/products';
@@ -238,7 +246,14 @@ export function ProductForm({ initialData, productId }: ProductFormProps) {
 
       const result = await res.json();
       if (!res.ok) {
-        alert(result.error || 'Có lỗi xảy ra khi lưu sản phẩm');
+        const detailMsgs = result.details
+          ? typeof result.details === 'object'
+            ? Object.entries(result.details)
+                .map(([field, errs]) => `${field}: ${Array.isArray(errs) ? errs.join(', ') : errs}`)
+                .join('\n')
+            : String(result.details)
+          : '';
+        alert((result.error || 'Có lỗi xảy ra khi lưu sản phẩm') + (detailMsgs ? `\n\nChi tiết:\n${detailMsgs}` : ''));
         return;
       }
 

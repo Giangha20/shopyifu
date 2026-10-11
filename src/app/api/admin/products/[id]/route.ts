@@ -79,15 +79,35 @@ export async function PATCH(
 
     const data = validation.data;
 
+    // Check SKU collision if SKU changed
+    if (data.sku && data.sku !== existingProduct.sku) {
+      const skuConflict = await prisma.product.findUnique({
+        where: { sku: data.sku },
+      });
+      if (skuConflict) {
+        return NextResponse.json(
+          { error: `Mã SKU "${data.sku}" đã được sử dụng bởi sản phẩm khác` },
+          { status: 409 }
+        );
+      }
+    }
+
+    const toDecimal = (val: any) => {
+      if (val === undefined || val === null || val === '') return null;
+      const num = Number(val);
+      if (isNaN(num)) return null;
+      return new Prisma.Decimal(num);
+    };
+
     const updated = await prisma.$transaction(async (tx) => {
-      if (data.categoryIds) {
+      if (Array.isArray(body.categoryIds)) {
         await tx.productCategory.deleteMany({
           where: { productId: id },
         });
 
-        if (data.categoryIds.length > 0) {
+        if (body.categoryIds.length > 0) {
           await tx.productCategory.createMany({
-            data: data.categoryIds.map((cid: string) => ({
+            data: body.categoryIds.map((cid: string) => ({
               productId: id,
               categoryId: cid,
             })),
@@ -126,19 +146,30 @@ export async function PATCH(
         });
 
         if (body.variants.length > 0) {
-          await tx.productVariant.createMany({
-            data: body.variants.map((v: any, idx: number) => ({
+          const usedSkus = new Set<string>();
+          const variantData = body.variants.map((v: any, idx: number) => {
+            let varSku = (v.sku || '').trim() || `${data.sku || existingProduct.sku}-${idx + 1}`;
+            if (usedSkus.has(varSku)) {
+              varSku = `${varSku}-${idx + 1}-${Date.now().toString(36).slice(-3)}`;
+            }
+            usedSkus.add(varSku);
+
+            return {
               productId: id,
               name: v.name || `Phiên bản ${idx + 1}`,
-              sku: v.sku || `${existingProduct.sku}-${idx + 1}`,
-              price: v.price ? new Prisma.Decimal(v.price) : null,
-              quantity: typeof v.quantity === 'number' ? v.quantity : 1,
+              sku: varSku,
+              price: toDecimal(v.price),
+              quantity: typeof v.quantity === 'number' ? Math.max(0, v.quantity) : Number(v.quantity) || 0,
               color: v.color || null,
               size: v.size || null,
               image: v.image || null,
               sortOrder: idx,
-              isActive: true,
-            })),
+              isActive: v.isActive !== undefined ? Boolean(v.isActive) : true,
+            };
+          });
+
+          await tx.productVariant.createMany({
+            data: variantData,
           });
         }
       }
@@ -150,12 +181,12 @@ export async function PATCH(
           sku: data.sku,
           shortDescription: data.shortDescription,
           description: data.description,
-          price: data.price !== undefined ? new Prisma.Decimal(data.price) : undefined,
-          compareAtPrice: data.compareAtPrice !== undefined ? (data.compareAtPrice ? new Prisma.Decimal(data.compareAtPrice) : null) : undefined,
-          costPrice: data.costPrice !== undefined ? (data.costPrice ? new Prisma.Decimal(data.costPrice) : null) : undefined,
+          price: data.price !== undefined ? (toDecimal(data.price) ?? new Prisma.Decimal(0)) : undefined,
+          compareAtPrice: data.compareAtPrice !== undefined ? toDecimal(data.compareAtPrice) : undefined,
+          costPrice: data.costPrice !== undefined ? toDecimal(data.costPrice) : undefined,
           quantity: data.quantity,
-          lowStockThreshold: data.lowStockThreshold,
-          weight: data.weight !== undefined ? (data.weight ? new Prisma.Decimal(data.weight) : null) : undefined,
+          lowStockThreshold: data.lowStockThreshold ?? undefined,
+          weight: data.weight !== undefined ? toDecimal(data.weight) : undefined,
           brand: data.brand,
           tags: data.tags,
           isActive: data.isActive,
@@ -193,7 +224,10 @@ export async function PATCH(
     }
     console.error('Admin update product error:', error);
     return NextResponse.json(
-      { error: 'Đã có lỗi xảy ra khi cập nhật sản phẩm' },
+      {
+        error: error instanceof Error ? error.message : 'Đã có lỗi xảy ra khi cập nhật sản phẩm',
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }
