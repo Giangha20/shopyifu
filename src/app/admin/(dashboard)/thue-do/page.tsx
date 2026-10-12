@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -25,6 +25,8 @@ import {
   ChevronDown,
   X,
   ExternalLink,
+  Plus,
+  Upload,
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -97,6 +99,22 @@ export default function AdminThueDoPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [productSearch, setProductSearch] = useState('');
+
+  // Tab 2: Add / Upload new rentable product modal
+  const [isAddRentalOpen, setIsAddRentalOpen] = useState(false);
+  const [newRentalName, setNewRentalName] = useState('');
+  const [newRentalSku, setNewRentalSku] = useState('');
+  const [newRentalPricePerDay, setNewRentalPricePerDay] = useState('');
+  const [newRentalDepositFee, setNewRentalDepositFee] = useState('');
+  const [newRentalPrice, setNewRentalPrice] = useState('');
+  const [newRentalQuantity, setNewRentalQuantity] = useState('5');
+  const [newRentalSizes, setNewRentalSizes] = useState<string[]>(['S', 'M', 'L']);
+  const [newRentalTerms, setNewRentalTerms] = useState('');
+  const [newRentalImages, setNewRentalImages] = useState<string[]>([]);
+  const [imageUrlInput, setImageUrlInput] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [savingNewRental, setSavingNewRental] = useState(false);
+  const rentalFileInputRef = useRef<HTMLInputElement>(null);
 
   // Tab 3: Rental Policies
   const [rentalTermsText, setRentalTermsText] = useState(
@@ -270,6 +288,122 @@ export default function AdminThueDoPage() {
       );
     } catch (err: any) {
       toast.error(err.message || 'Lỗi khi lưu giá thuê');
+    }
+  };
+
+  // Upload image for new rental product
+  const handleUploadRentalImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingImage(true);
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lỗi khi tải ảnh lên');
+      setNewRentalImages((prev) => [...prev, data.url]);
+      toast.success('Đã tải ảnh lên thành công!');
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi khi tải ảnh');
+    } finally {
+      setUploadingImage(false);
+      if (rentalFileInputRef.current) rentalFileInputRef.current.value = '';
+    }
+  };
+
+  const handleAddImageUrl = () => {
+    if (!imageUrlInput.trim()) return;
+    setNewRentalImages((prev) => [...prev, imageUrlInput.trim()]);
+    setImageUrlInput('');
+  };
+
+  const handleRemoveRentalImage = (idx: number) => {
+    setNewRentalImages((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  // Create new rentable product
+  const handleCreateRentalProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newRentalName.trim() || !newRentalPricePerDay) {
+      toast.error('Vui lòng nhập tên trang phục và giá thuê theo ngày!');
+      return;
+    }
+
+    try {
+      setSavingNewRental(true);
+      const sku = newRentalSku.trim() || `THUE-${Date.now().toString(36).toUpperCase().slice(-5)}`;
+      const priceVal = Number(newRentalPrice) || Number(newRentalPricePerDay) * 7;
+      const rentPriceVal = Number(newRentalPricePerDay);
+      const depFeeVal = Number(newRentalDepositFee) || Math.round(priceVal * 0.7);
+
+      const imagesToSave =
+        newRentalImages.length > 0
+          ? newRentalImages.map((url, idx) => ({ url, alt: newRentalName, isPrimary: idx === 0 }))
+          : [{ url: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80', isPrimary: true }];
+
+      const variants = newRentalSizes.map((s) => ({
+        name: `${newRentalName} - Size ${s}`,
+        sku: `${sku}-${s}`,
+        size: s,
+        quantity: Math.max(1, Math.floor(Number(newRentalQuantity) / newRentalSizes.length)),
+        isActive: true,
+      }));
+
+      const payload = {
+        name: newRentalName.trim(),
+        sku,
+        price: priceVal,
+        quantity: Number(newRentalQuantity) || 5,
+        isRentable: true,
+        rentalPricePerDay: rentPriceVal,
+        rentalDepositFee: depFeeVal,
+        rentalTerms: newRentalTerms.trim() || null,
+        description: `Trang phục cho thuê cao cấp: ${newRentalName.trim()}.\nĐã giặt hấp sạch sẽ, ủi phẳng, sẵn sàng phục vụ sự kiện, tiệc cưới, dạ hội, chụp ảnh nghệ thuật.`,
+        images: imagesToSave,
+        variants,
+      };
+
+      const res = await fetch('/api/admin/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lỗi khi đăng trang phục');
+
+      toast.success('Đã đăng trang phục cho thuê thành công!');
+      setIsAddRentalOpen(false);
+      setNewRentalName('');
+      setNewRentalSku('');
+      setNewRentalPricePerDay('');
+      setNewRentalDepositFee('');
+      setNewRentalPrice('');
+      setNewRentalTerms('');
+      setNewRentalImages([]);
+      loadProducts();
+    } catch (err: any) {
+      toast.error(err.message || 'Không thể tạo đồ cho thuê');
+    } finally {
+      setSavingNewRental(false);
+    }
+  };
+
+  // Delete product
+  const handleDeleteProduct = async (id: string) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi hệ thống?')) return;
+    try {
+      const res = await fetch(`/api/admin/products/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lỗi khi xóa sản phẩm');
+      toast.success('Đã xóa sản phẩm thành công');
+      loadProducts();
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi xóa sản phẩm');
     }
   };
 
@@ -578,8 +712,8 @@ export default function AdminThueDoPage() {
       {/* TAB 2: RENTABLE PRODUCTS CATALOG */}
       {activeTab === 'products' && (
         <div className="space-y-4">
-          <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-            <div className="relative w-72">
+          <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="relative w-full sm:w-72">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
@@ -589,8 +723,15 @@ export default function AdminThueDoPage() {
                 className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-luxury-gold/40"
               />
             </div>
-            <div className="text-xs text-slate-500">
-              Bật/Tắt tính năng cho thuê và cấu hình giá thuê theo ngày + tiền cọc
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsAddRentalOpen(true)}
+                className="btn-gold text-xs px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-md hover:shadow-lg transition-all"
+              >
+                <Plus className="w-4 h-4" />
+                <span>+ Đăng Đồ Cho Thuê Mới</span>
+              </button>
             </div>
           </div>
 
@@ -692,12 +833,24 @@ export default function AdminThueDoPage() {
                             />
                           </td>
                           <td className="p-4 text-right">
-                            <Link
-                              href={`/admin/san-pham/${prod.id}`}
-                              className="text-xs text-luxury-gold hover:underline font-semibold"
-                            >
-                              Sửa chi tiết →
-                            </Link>
+                            <div className="flex items-center justify-end gap-2">
+                              <Link
+                                href={`/admin/san-pham/${prod.id}`}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs text-luxury-gold bg-luxury-gold/10 hover:bg-luxury-gold/20 rounded-lg font-semibold transition-colors"
+                                title="Sửa chi tiết"
+                              >
+                                <Edit className="w-3.5 h-3.5" />
+                                <span>Sửa</span>
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteProduct(prod.id)}
+                                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                title="Xóa sản phẩm"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -932,6 +1085,245 @@ export default function AdminThueDoPage() {
                     {isUpdating ? 'Đang lưu...' : 'Lưu cập nhật'}
                   </button>
                 </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL ĐĂNG TẢI TRANG PHỤC CHO THUÊ MỚI */}
+      {isAddRentalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 sm:p-8 relative border border-gray-100 max-h-[92vh] overflow-y-auto">
+            <button
+              onClick={() => setIsAddRentalOpen(false)}
+              className="absolute top-5 right-5 p-2 text-gray-400 hover:text-black rounded-full hover:bg-gray-100"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <form onSubmit={handleCreateRentalProduct} className="space-y-5">
+              <div>
+                <span className="text-xs font-bold text-luxury-gold uppercase tracking-wider">
+                  Thêm mới vào danh mục cho thuê
+                </span>
+                <h3 className="font-serif text-2xl font-bold text-luxury-black mt-1">
+                  Đăng Tải Trang Phục Cho Thuê Mới
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Sản phẩm sẽ tự động hiển thị trong trang Cho Thuê Đồ và cho phép khách hàng đặt lịch thuê trực tuyến.
+                </p>
+              </div>
+
+              {/* Tên & SKU */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Tên trang phục <span className="text-rose-500">*</span>:
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="VD: Đầm Dạ Hội Kim Sa Hoàng Gia YIFU"
+                    value={newRentalName}
+                    onChange={(e) => setNewRentalName(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-gray-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-luxury-gold/40 focus:border-luxury-gold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Mã SKU (tự sinh nếu để trống):
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="VD: THUE-DH01"
+                    value={newRentalSku}
+                    onChange={(e) => setNewRentalSku(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-gray-200 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-luxury-gold/40 focus:border-luxury-gold"
+                  />
+                </div>
+              </div>
+
+              {/* Upload ảnh */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Hình ảnh trang phục (Tải từ máy tính hoặc nhập Link):
+                </label>
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <input
+                    type="file"
+                    ref={rentalFileInputRef}
+                    onChange={handleUploadRentalImage}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    disabled={uploadingImage}
+                    onClick={() => rentalFileInputRef.current?.click()}
+                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold flex items-center gap-2 border border-slate-200 transition-colors"
+                  >
+                    <Upload className="w-4 h-4 text-luxury-gold" />
+                    <span>{uploadingImage ? 'Đang tải ảnh...' : 'Chọn ảnh từ máy tính'}</span>
+                  </button>
+
+                  <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+                    <input
+                      type="url"
+                      placeholder="Hoặc dán URL ảnh (https://...)"
+                      value={imageUrlInput}
+                      onChange={(e) => setImageUrlInput(e.target.value)}
+                      className="flex-1 p-2 bg-slate-50 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-luxury-gold"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddImageUrl}
+                      className="px-3 py-2 bg-slate-800 text-white rounded-xl text-xs font-semibold hover:bg-black"
+                    >
+                      Thêm URL
+                    </button>
+                  </div>
+                </div>
+
+                {/* Danh sách ảnh đã upload */}
+                {newRentalImages.length > 0 && (
+                  <div className="flex flex-wrap gap-3 p-3 bg-slate-50 rounded-2xl border border-gray-100">
+                    {newRentalImages.map((imgUrl, idx) => (
+                      <div key={idx} className="relative w-20 h-24 rounded-xl overflow-hidden border border-gray-200 shadow-xs group">
+                        <Image src={imgUrl} alt={`Ảnh ${idx + 1}`} fill className="object-cover" />
+                        {idx === 0 && (
+                          <span className="absolute bottom-1 left-1 right-1 bg-luxury-gold text-white text-[9px] font-bold py-0.5 text-center rounded">
+                            Ảnh chính
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveRentalImage(idx)}
+                          className="absolute top-1 right-1 p-1 bg-black/60 text-white rounded-full opacity-0 group-hover:opacity-100 hover:bg-rose-600 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Giá thuê, Tiền cọc, Giá bán gốc */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Giá thuê / ngày (VNĐ) <span className="text-rose-500">*</span>:
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    placeholder="VD: 350000"
+                    value={newRentalPricePerDay}
+                    onChange={(e) => setNewRentalPricePerDay(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-gray-200 rounded-xl text-xs font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-luxury-gold/40 focus:border-luxury-gold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Tiền cọc đảm bảo (VNĐ):
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Mặc định: 70% giá trị đồ"
+                    value={newRentalDepositFee}
+                    onChange={(e) => setNewRentalDepositFee(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-gray-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-luxury-gold/40 focus:border-luxury-gold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Giá trị gốc trang phục (VNĐ):
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="VD: 2500000"
+                    value={newRentalPrice}
+                    onChange={(e) => setNewRentalPrice(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-gray-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-luxury-gold/40 focus:border-luxury-gold"
+                  />
+                </div>
+              </div>
+
+              {/* Số lượng và Chọn Size */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Số lượng trong kho cho thuê:
+                  </label>
+                  <input
+                    type="number"
+                    value={newRentalQuantity}
+                    onChange={(e) => setNewRentalQuantity(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-gray-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-luxury-gold/40"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Các kích cỡ có sẵn:
+                  </label>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Freesize'].map((sz) => {
+                      const isSelected = newRentalSizes.includes(sz);
+                      return (
+                        <button
+                          key={sz}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              setNewRentalSizes((prev) => prev.filter((s) => s !== sz));
+                            } else {
+                              setNewRentalSizes((prev) => [...prev, sz]);
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                            isSelected
+                              ? 'bg-luxury-gold text-white shadow-xs'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          {sz}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Điều khoản riêng */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Quy định & Lưu ý bảo quản riêng cho trang phục này (tùy chọn):
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="VD: Trang phục có đính đá pha lê thủ công, chỉ giặt khô, không là nhiệt độ cao..."
+                  value={newRentalTerms}
+                  onChange={(e) => setNewRentalTerms(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-luxury-gold/40"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setIsAddRentalOpen(false)}
+                  className="px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingNewRental}
+                  className="btn-gold px-6 py-2.5 text-xs font-bold rounded-xl shadow-md flex items-center gap-2"
+                >
+                  {savingNewRental ? 'Đang tạo sản phẩm...' : 'Đăng tải trang phục cho thuê'}
+                </button>
               </div>
             </form>
           </div>

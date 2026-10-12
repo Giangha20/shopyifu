@@ -41,44 +41,63 @@ export async function GET(request: NextRequest) {
     }
 
     if (category && category !== 'all') {
-      const targetCategory = await prisma.category.findFirst({
+      const CATEGORY_MAP: Record<string, string[]> = {
+        'ao-so-mi-nu': ['ao-so-mi', 'ao'],
+        'so-mi-nam': ['ao-so-mi', 'ao'],
+        'dam-da-hoi': ['dam', 'vay-dam'],
+        'dam-vay-thiet-ke': ['dam', 'vay-dam', 'chan-vay'],
+        'ao-khoac-nu': ['ao-khoac', 'ao'],
+        'ao-khoac-nam': ['ao-khoac', 'ao'],
+        'ao-khoac-blazer': ['ao-khoac', 'ao'],
+        'quan-vay-nu': ['chan-vay', 'quan', 'quan-tay'],
+        'set-do-nu': ['dam', 'ao', 'quan'],
+        'suit-nam': ['ao-khoac', 'quan-tay', 'ao'],
+        'polo-nam': ['ao-thun', 'ao'],
+        'quan-tay-nam': ['quan-tay', 'quan'],
+        'tui-xach-da': ['tui-xach', 'phu-kien'],
+        'vi-da': ['tui-xach', 'phu-kien'],
+        'that-lung': ['phu-kien'],
+        'khan-lua': ['khan', 'phu-kien'],
+        'kinh-mat': ['phu-kien'],
+        'phu-kien-trang-suc': ['trang-suc', 'phu-kien'],
+        'dong-ho': ['trang-suc', 'phu-kien'],
+        'day-chuyen': ['trang-suc', 'phu-kien'],
+        'nhan': ['trang-suc', 'phu-kien'],
+        'ngoc-trai': ['trang-suc', 'phu-kien'],
+        'khuyen-tai': ['trang-suc', 'phu-kien'],
+      };
+
+      const mappedSlugs = CATEGORY_MAP[category] || [category];
+
+      const targetCategories = await prisma.category.findMany({
         where: {
           OR: [
-            { slug: category },
-            { id: category },
-            { slug: { equals: category, mode: 'insensitive' } },
-            { name: { equals: category, mode: 'insensitive' } },
+            { slug: { in: mappedSlugs } },
+            { id: { in: mappedSlugs } },
+            ...mappedSlugs.map((s) => ({ slug: { contains: s, mode: 'insensitive' as const } })),
           ],
         },
         include: { children: true },
       });
 
-      if (targetCategory) {
-        const categoryIds = [targetCategory.id, ...(targetCategory.children?.map((c) => c.id) || [])];
-        const categorySlugs = [targetCategory.slug, ...(targetCategory.children?.map((c) => c.slug) || [])];
+      if (targetCategories.length > 0) {
+        const catIds = Array.from(
+          new Set([
+            ...targetCategories.map((c) => c.id),
+            ...targetCategories.flatMap((c) => c.children?.map((ch) => ch.id) || []),
+          ])
+        );
         where.categories = {
           some: {
-            category: {
-              OR: [
-                { id: { in: categoryIds } },
-                { slug: { in: categorySlugs } },
-                { parentId: targetCategory.id },
-              ],
-            },
+            categoryId: { in: catIds },
           },
         };
       } else {
-        where.categories = {
-          some: {
-            category: {
-              OR: [
-                { slug: { equals: category, mode: 'insensitive' } },
-                { id: category },
-                { name: { contains: category, mode: 'insensitive' } },
-              ],
-            },
-          },
-        };
+        const cleanKeyword = category.replace(/-/g, ' ');
+        where.OR = [
+          { name: { contains: cleanKeyword, mode: 'insensitive' } },
+          { description: { contains: cleanKeyword, mode: 'insensitive' } },
+        ];
       }
     }
 
