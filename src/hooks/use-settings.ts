@@ -3,6 +3,7 @@ import { create } from 'zustand';
 export interface StoreSettings {
   storeName: string;
   storeSlogan: string;
+  storeLogo?: string;
   contactEmail: string;
   contactPhone: string;
   contactAddress: string;
@@ -55,6 +56,7 @@ export const useStoreSettings = create<SettingsStore>((set) => ({
           settings: {
             storeName: data.store_name || data.siteName || data.storeName || defaultSettings.storeName,
             storeSlogan: data.store_slogan || data.siteDescription || defaultSettings.storeSlogan,
+            storeLogo: data.store_logo || data.storeLogo || '',
             contactEmail: data.contact_email || data.contactEmail || defaultSettings.contactEmail,
             contactPhone: data.contact_phone || data.contactPhone || defaultSettings.contactPhone,
             contactAddress: data.contact_address || data.contactAddress || defaultSettings.contactAddress,

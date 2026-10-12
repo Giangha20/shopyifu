@@ -42,9 +42,9 @@ export async function middleware(request: NextRequest) {
   // 3. Admin Routes Protection: /admin/*
   if (pathname.startsWith('/admin')) {
     const adminToken = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
-    const isLoginPage = pathname === '/admin/login';
+    const isAuthPage = pathname === '/admin/login' || pathname === '/admin/dang-ky';
 
-    if (isLoginPage) {
+    if (isAuthPage) {
       if (adminToken) {
         const payload = await verifyEdgeToken(adminToken);
         if (payload && payload.type === 'admin') {

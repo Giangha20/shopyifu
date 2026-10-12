@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
 import {
   Settings,
   Save,
@@ -22,26 +23,66 @@ import {
   Shirt,
   Bell,
   FileCheck,
+  Mail,
+  Shield,
+  Key,
+  Volume2,
+  VolumeX,
+  Send,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useStoreSettings } from '@/hooks/use-settings';
+import { toast } from 'sonner';
 
 export default function AdminSettingsPage() {
   const [activeTab, setActiveTab] = useState<
-    'general' | 'contact' | 'social' | 'shipping' | 'payment' | 'registration' | 'rental' | 'announcement' | 'policies' | 'seo'
+    'general' | 'email' | 'notifications' | 'admin_reg' | 'contact' | 'social' | 'shipping' | 'payment' | 'registration' | 'rental' | 'announcement' | 'policies' | 'seo'
   >('general');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingQr, setUploadingQr] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingFavicon, setUploadingFavicon] = useState(false);
+  const [testingEmail, setTestingEmail] = useState(false);
+  const [testEmailTarget, setTestEmailTarget] = useState('');
+
+  // Quick admin creation
+  const [newAdminFirstName, setNewAdminFirstName] = useState('');
+  const [newAdminLastName, setNewAdminLastName] = useState('');
+  const [newAdminEmail, setNewAdminEmail] = useState('');
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [newAdminRole, setNewAdminRole] = useState('admin');
+  const [creatingAdmin, setCreatingAdmin] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoFileInputRef = useRef<HTMLInputElement>(null);
+  const faviconFileInputRef = useRef<HTMLInputElement>(null);
 
   // Settings form state
   const [settings, setSettings] = useState({
-    // General
+    // General & Branding
     store_name: 'LUXE SHOP',
     store_slogan: 'Thời Trang Cao Cấp & Đẳng Cấp Thượng Lưu',
-    store_logo: '/logo.png',
+    store_logo: '',
+    store_favicon: '',
+    brand_color: '#C9A96E',
     store_currency: 'VND',
+    // Email & Gmail SMTP
+    smtp_host: 'smtp.gmail.com',
+    smtp_port: '465',
+    smtp_user: '',
+    smtp_pass: '',
+    smtp_secure: 'true',
+    smtp_from_name: 'LUXE SHOP',
+    admin_notify_email: '',
+    // Order Notifications
+    order_sound_alert_enabled: 'true',
+    order_poll_interval: '15',
+    browser_push_enabled: 'true',
+    // Admin Registration
+    allow_admin_registration: 'true',
+    admin_registration_secret_key: 'YIFU@ADMIN2026',
     // Contact
     contact_email: 'contact@luxeshop.vn',
     contact_phone: '1900 8888',
@@ -152,6 +193,102 @@ export default function AdminSettingsPage() {
     handleChange('payment_qr_code', qrUrl);
   };
 
+  const handleUploadLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingLogo(true);
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lỗi tải ảnh logo');
+      handleChange('store_logo', data.url);
+      toast.success('Đã tải ảnh logo lên thành công!');
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi tải logo');
+    } finally {
+      setUploadingLogo(false);
+      if (logoFileInputRef.current) logoFileInputRef.current.value = '';
+    }
+  };
+
+  const handleUploadFavicon = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingFavicon(true);
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lỗi tải favicon');
+      handleChange('store_favicon', data.url);
+      toast.success('Đã tải favicon lên thành công!');
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi tải favicon');
+    } finally {
+      setUploadingFavicon(false);
+      if (faviconFileInputRef.current) faviconFileInputRef.current.value = '';
+    }
+  };
+
+  const handleTestEmail = async () => {
+    const target = testEmailTarget || settings.admin_notify_email || settings.contact_email;
+    if (!target) {
+      toast.error('Vui lòng nhập địa chỉ email nhận thư kiểm tra');
+      return;
+    }
+    try {
+      setTestingEmail(true);
+      const res = await fetch('/api/admin/email/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: target }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Gửi email thất bại');
+      toast.success(data.message || 'Đã gửi email kiểm tra thành công!');
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi gửi email kiểm tra');
+    } finally {
+      setTestingEmail(false);
+    }
+  };
+
+  const handleCreateQuickAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAdminEmail || !newAdminPassword || !newAdminFirstName) {
+      toast.error('Vui lòng nhập đầy đủ thông tin nhân viên');
+      return;
+    }
+    try {
+      setCreatingAdmin(true);
+      const res = await fetch('/api/admin/staff', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: newAdminFirstName,
+          lastName: newAdminLastName,
+          email: newAdminEmail,
+          password: newAdminPassword,
+          roleId: newAdminRole,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Tạo quản trị viên thất bại');
+      toast.success(`Đã tạo tài khoản quản trị cho ${newAdminEmail} thành công!`);
+      setNewAdminFirstName('');
+      setNewAdminLastName('');
+      setNewAdminEmail('');
+      setNewAdminPassword('');
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi khi tạo quản trị viên');
+    } finally {
+      setCreatingAdmin(false);
+    }
+  };
+
   useEffect(() => {
     async function load() {
       try {
@@ -188,21 +325,24 @@ export default function AdminSettingsPage() {
 
       if (!res.ok) throw new Error('Failed to save');
       await useStoreSettings.getState().fetchSettings();
-      alert('Đã lưu cấu hình cửa hàng thành công!');
+      toast.success('Đã lưu cấu hình cửa hàng thành công!');
     } catch (err) {
       console.error(err);
-      alert('Lỗi lưu cấu hình');
+      toast.error('Lỗi lưu cấu hình');
     } finally {
       setSaving(false);
     }
   };
 
   const tabs = [
-    { id: 'general', label: 'Chung', icon: Globe },
+    { id: 'general', label: 'Thương hiệu & Logo', icon: Globe },
+    { id: 'email', label: 'Gmail SMTP & Thông báo Email', icon: Mail },
+    { id: 'notifications', label: 'Chuông báo đơn mới trên Web', icon: Bell },
+    { id: 'admin_reg', label: 'Quản trị viên & Đăng ký Admin', icon: Shield },
     { id: 'payment', label: 'Thanh toán (Quốc tế & VietQR)', icon: CreditCard },
     { id: 'rental', label: 'Dịch vụ Thuê đồ', icon: Shirt },
     { id: 'announcement', label: 'Thanh thông báo Banner', icon: Bell },
-    { id: 'registration', label: 'Cài đặt Đăng ký', icon: UserPlus },
+    { id: 'registration', label: 'Cài đặt Đăng ký Khách', icon: UserPlus },
     { id: 'shipping', label: 'Vận chuyển', icon: Truck },
     { id: 'contact', label: 'Liên hệ & Doanh nghiệp', icon: Phone },
     { id: 'social', label: 'Mạng xã hội', icon: Share2 },
@@ -254,25 +394,463 @@ export default function AdminSettingsPage() {
       {/* Tab Panels */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
         {activeTab === 'general' && (
-          <div className="space-y-4">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">Thông tin chung</h2>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">Tên thương hiệu</label>
-              <input
-                type="text"
-                value={settings.store_name}
-                onChange={(e) => handleChange('store_name', e.target.value)}
-                className="h-10 w-full rounded-lg border border-slate-300 px-3 text-xs focus:border-luxury-gold focus:outline-none"
-              />
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">Thương hiệu & Nhận diện</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Tùy chỉnh tên cửa hàng, logo, favicon và giao diện hiển thị trên website</p>
             </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">Khẩu hiệu (Slogan)</label>
-              <input
-                type="text"
-                value={settings.store_slogan}
-                onChange={(e) => handleChange('store_slogan', e.target.value)}
-                className="h-10 w-full rounded-lg border border-slate-300 px-3 text-xs focus:border-luxury-gold focus:outline-none"
-              />
+
+            {/* LOGO SHOP */}
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+              <label className="block text-xs font-bold text-slate-800">
+                Logo cửa hàng (Hiển thị trên Header thanh điều hướng):
+              </label>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                {/* Preview Logo */}
+                <div className="h-16 w-36 bg-white rounded-xl border border-dashed border-slate-300 flex items-center justify-center p-2 overflow-hidden shadow-xs shrink-0">
+                  {settings.store_logo ? (
+                    <img src={settings.store_logo} alt="Logo" className="max-h-full max-w-full object-contain" />
+                  ) : (
+                    <span className="text-[10px] text-slate-400 font-semibold text-center">Chưa có logo ảnh (Dùng logo chữ)</span>
+                  )}
+                </div>
+
+                {/* Upload & URL Buttons */}
+                <div className="flex-1 space-y-2 w-full">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <input
+                      type="file"
+                      ref={logoFileInputRef}
+                      onChange={handleUploadLogo}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      disabled={uploadingLogo}
+                      onClick={() => logoFileInputRef.current?.click()}
+                      className="px-3.5 py-2 bg-luxury-black hover:bg-black text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-xs"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-luxury-gold" />
+                      <span>{uploadingLogo ? 'Đang tải logo lên...' : 'Tải logo từ máy tính'}</span>
+                    </button>
+
+                    {settings.store_logo && (
+                      <button
+                        type="button"
+                        onClick={() => handleChange('store_logo', '')}
+                        className="px-3 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Xóa logo</span>
+                      </button>
+                    )}
+                  </div>
+
+                  <input
+                    type="url"
+                    placeholder="Hoặc dán link ảnh logo (https://...)"
+                    value={settings.store_logo}
+                    onChange={(e) => handleChange('store_logo', e.target.value)}
+                    className="h-9 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                  />
+                  <p className="text-[11px] text-slate-400">Khuyên dùng ảnh định dạng PNG nền trong suốt, kích thước tỷ lệ 4:1 (khoảng 240x60px).</p>
+                </div>
+              </div>
+            </div>
+
+            {/* FAVICON SHOP */}
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+              <label className="block text-xs font-bold text-slate-800">
+                Biểu tượng Favicon (Hiển thị trên tab trình duyệt):
+              </label>
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 bg-white rounded-lg border border-slate-300 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                  {settings.store_favicon ? (
+                    <img src={settings.store_favicon} alt="Favicon" className="h-full w-full object-contain" />
+                  ) : (
+                    <Globe className="w-5 h-5 text-slate-400" />
+                  )}
+                </div>
+                <input
+                  type="file"
+                  ref={faviconFileInputRef}
+                  onChange={handleUploadFavicon}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  disabled={uploadingFavicon}
+                  onClick={() => faviconFileInputRef.current?.click()}
+                  className="px-3 py-2 bg-white border border-slate-300 hover:bg-slate-100 rounded-xl text-xs font-semibold flex items-center gap-1.5"
+                >
+                  <Upload className="w-3.5 h-3.5 text-luxury-gold" />
+                  <span>{uploadingFavicon ? 'Đang tải...' : 'Tải favicon'}</span>
+                </button>
+                <input
+                  type="url"
+                  placeholder="Hoặc URL favicon"
+                  value={settings.store_favicon}
+                  onChange={(e) => handleChange('store_favicon', e.target.value)}
+                  className="h-9 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* BRAND NAME & SLOGAN */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Tên thương hiệu / Cửa hàng</label>
+                <input
+                  type="text"
+                  value={settings.store_name}
+                  onChange={(e) => handleChange('store_name', e.target.value)}
+                  className="h-10 w-full rounded-xl border border-slate-300 px-3 text-xs font-semibold focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Khẩu hiệu thương hiệu (Slogan)</label>
+                <input
+                  type="text"
+                  value={settings.store_slogan}
+                  onChange={(e) => handleChange('store_slogan', e.target.value)}
+                  className="h-10 w-full rounded-xl border border-slate-300 px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Màu chủ đạo thương hiệu (Brand Color)</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={settings.brand_color || '#C9A96E'}
+                    onChange={(e) => handleChange('brand_color', e.target.value)}
+                    className="h-10 w-12 rounded-lg border border-slate-300 cursor-pointer p-0.5 bg-white"
+                  />
+                  <input
+                    type="text"
+                    value={settings.brand_color || '#C9A96E'}
+                    onChange={(e) => handleChange('brand_color', e.target.value)}
+                    className="h-10 flex-1 rounded-xl border border-slate-300 px-3 text-xs font-mono focus:border-luxury-gold focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Đơn vị tiền tệ chính</label>
+                <input
+                  type="text"
+                  value={settings.store_currency}
+                  onChange={(e) => handleChange('store_currency', e.target.value)}
+                  className="h-10 w-full rounded-xl border border-slate-300 px-3 text-xs font-semibold focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB EMAIL & GMAIL SMTP */}
+        {activeTab === 'email' && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">Cấu hình gửi Email & Gmail SMTP</h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Khi khách hàng đăng ký tài khoản hoặc đặt hàng, hệ thống sẽ tự động gửi email thông báo qua tài khoản Gmail này.
+              </p>
+            </div>
+
+            <div className="bg-amber-50/60 p-4 rounded-2xl border border-amber-200/80 text-xs text-amber-900 space-y-1.5 leading-relaxed">
+              <div className="font-bold flex items-center gap-1.5 text-amber-800">
+                <Sparkles className="w-4 h-4 text-luxury-gold" />
+                <span>Hướng dẫn thiết lập gửi thư bằng Gmail miễn phí 100%:</span>
+              </div>
+              <p>1. Đăng nhập tài khoản Google của shop $\rightarrow$ Chọn mục <strong>Bảo mật (Security)</strong> $\rightarrow$ Bật <strong>Xác minh 2 bước</strong>.</p>
+              <p>2. Tìm kiếm mục <strong>Mật khẩu ứng dụng (App Passwords)</strong> $\rightarrow$ Đặt tên &ldquo;Website Shop&rdquo; $\rightarrow$ Google sẽ cấp mã <strong>16 ký tự</strong>.</p>
+              <p>3. Dán 16 ký tự đó vào ô <strong>Mật khẩu ứng dụng Gmail</strong> bên dưới.</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">
+                  Địa chỉ Gmail / Email gửi thư <span className="text-rose-500">*</span>:
+                </label>
+                <input
+                  type="email"
+                  placeholder="VD: yifushop.vn@gmail.com"
+                  value={settings.smtp_user}
+                  onChange={(e) => handleChange('smtp_user', e.target.value)}
+                  className="h-10 w-full rounded-xl border border-slate-300 px-3 text-xs font-semibold focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">
+                  Mật khẩu ứng dụng Gmail (App Password) <span className="text-rose-500">*</span>:
+                </label>
+                <input
+                  type="password"
+                  placeholder="16 ký tự do Google cấp (VD: abcd efgh ijkl mnop)"
+                  value={settings.smtp_pass}
+                  onChange={(e) => handleChange('smtp_pass', e.target.value)}
+                  className="h-10 w-full rounded-xl border border-slate-300 px-3 text-xs font-mono focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Tên thương hiệu hiển thị khi gửi thư:</label>
+                <input
+                  type="text"
+                  placeholder="VD: YIFU SHOP"
+                  value={settings.smtp_from_name}
+                  onChange={(e) => handleChange('smtp_from_name', e.target.value)}
+                  className="h-10 w-full rounded-xl border border-slate-300 px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">
+                  Email Quản trị viên nhận thông báo khi có đơn mới:
+                </label>
+                <input
+                  type="email"
+                  placeholder="VD: chushop@gmail.com"
+                  value={settings.admin_notify_email}
+                  onChange={(e) => handleChange('admin_notify_email', e.target.value)}
+                  className="h-10 w-full rounded-xl border border-slate-300 px-3 text-xs font-semibold focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Máy chủ SMTP (Mặc định Gmail):</label>
+                <input
+                  type="text"
+                  value={settings.smtp_host || 'smtp.gmail.com'}
+                  onChange={(e) => handleChange('smtp_host', e.target.value)}
+                  className="h-10 w-full rounded-xl border border-slate-300 px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Cổng SMTP (Port):</label>
+                <input
+                  type="text"
+                  value={settings.smtp_port || '465'}
+                  onChange={(e) => handleChange('smtp_port', e.target.value)}
+                  className="h-10 w-full rounded-xl border border-slate-300 px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Test Email Box */}
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 pt-4">
+              <label className="block text-xs font-bold text-slate-800">
+                Thử nghiệm gửi thư kiểm tra (Test Email):
+              </label>
+              <div className="flex flex-col sm:flex-row items-center gap-2">
+                <input
+                  type="email"
+                  placeholder="Nhập địa chỉ email của bạn để nhận thư thử nghiệm..."
+                  value={testEmailTarget}
+                  onChange={(e) => setTestEmailTarget(e.target.value)}
+                  className="h-10 w-full sm:flex-1 rounded-xl border border-slate-300 bg-white px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                />
+                <button
+                  type="button"
+                  disabled={testingEmail}
+                  onClick={handleTestEmail}
+                  className="w-full sm:w-auto px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-colors shrink-0"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>{testingEmail ? 'Đang gửi thử...' : 'Gửi thử Email ngay'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB CHUÔNG BÁO ĐƠN MỚI TRÊN WEB */}
+        {activeTab === 'notifications' && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">Chuông Báo & Thông Báo Đơn Hàng Mới</h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Cấu hình âm thanh chuông báo và thông báo nổi khi có đơn hàng mới phát sinh trên website
+              </p>
+            </div>
+
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-bold text-slate-800">Âm thanh chuông báo đơn mới (Chime Sound)</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">
+                    Tự động phát chuông &ldquo;Ting-Ting&rdquo; sang trọng khi có khách đặt hàng
+                  </div>
+                </div>
+                <select
+                  value={settings.order_sound_alert_enabled || 'true'}
+                  onChange={(e) => handleChange('order_sound_alert_enabled', e.target.value)}
+                  className="p-2 border border-slate-300 rounded-xl text-xs font-bold bg-white focus:outline-none focus:ring-1 focus:ring-luxury-gold"
+                >
+                  <option value="true">BẬT ÂM BÁO 🔔</option>
+                  <option value="false">TẮT ÂM BÁO 🔕</option>
+                </select>
+              </div>
+
+              <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-bold text-slate-800">Thông báo nổi trên màn hình máy tính (Desktop Push)</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">
+                    Hiện thông báo góc phải màn hình ngay cả khi đang chuyển tab khác
+                  </div>
+                </div>
+                <select
+                  value={settings.browser_push_enabled || 'true'}
+                  onChange={(e) => handleChange('browser_push_enabled', e.target.value)}
+                  className="p-2 border border-slate-300 rounded-xl text-xs font-bold bg-white focus:outline-none focus:ring-1 focus:ring-luxury-gold"
+                >
+                  <option value="true">CHO PHÉP THÔNG BÁO</option>
+                  <option value="false">KHÔNG THÔNG BÁO</option>
+                </select>
+              </div>
+
+              <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-bold text-slate-800">Tần suất tự động kiểm tra đơn hàng mới</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">Thời gian giãn cách giữa các lần hệ thống quét đơn mới</div>
+                </div>
+                <select
+                  value={settings.order_poll_interval || '15'}
+                  onChange={(e) => handleChange('order_poll_interval', e.target.value)}
+                  className="p-2 border border-slate-300 rounded-xl text-xs font-semibold bg-white focus:outline-none focus:ring-1 focus:ring-luxury-gold"
+                >
+                  <option value="10">Mỗi 10 giây (Rất nhanh)</option>
+                  <option value="15">Mỗi 15 giây (Khuyên dùng)</option>
+                  <option value="30">Mỗi 30 giây</option>
+                  <option value="60">Mỗi 1 phút</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB QUẢN TRỊ VIÊN & ĐĂNG KÝ ADMIN */}
+        {activeTab === 'admin_reg' && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">Quản Trị Viên & Cấu Hình Đăng Ký Admin</h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Quản lý quyền truy cập trang quản trị và cấp quyền đăng ký an toàn cho nhân viên
+              </p>
+            </div>
+
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-bold text-slate-800">Cho phép đăng ký tài khoản Quản trị viên mới:</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">
+                    Khi bật, nhân viên có thể đăng ký tại trang <code>/admin/dang-ky</code> với Mã Bí Mật
+                  </div>
+                </div>
+                <select
+                  value={settings.allow_admin_registration || 'true'}
+                  onChange={(e) => handleChange('allow_admin_registration', e.target.value)}
+                  className="p-2 border border-slate-300 rounded-xl text-xs font-bold bg-white focus:outline-none focus:ring-1 focus:ring-luxury-gold"
+                >
+                  <option value="true">MỞ ĐĂNG KÝ ADMIN</option>
+                  <option value="false">TẠM KHÓA ĐĂNG KÝ</option>
+                </select>
+              </div>
+
+              <div className="space-y-1 pt-2">
+                <label className="text-xs font-bold text-slate-800">
+                  Mã Bí Mật Xác Thực Đăng Ký (Admin Secret Key):
+                </label>
+                <input
+                  type="text"
+                  placeholder="VD: YIFU@ADMIN2026"
+                  value={settings.admin_registration_secret_key || 'YIFU@ADMIN2026'}
+                  onChange={(e) => handleChange('admin_registration_secret_key', e.target.value)}
+                  className="h-10 w-full rounded-xl border border-slate-300 px-3 text-xs font-mono font-bold text-amber-800 focus:border-luxury-gold focus:outline-none bg-white"
+                />
+                <p className="text-[11px] text-slate-400">Chỉ những ai có mã bí mật này mới có thể đăng ký quyền quản trị viên.</p>
+              </div>
+
+              <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between text-xs">
+                <div>
+                  <span className="font-semibold text-slate-700">Đường dẫn trang đăng ký Admin:</span>{' '}
+                  <span className="font-mono text-luxury-gold">/admin/dang-ky</span>
+                </div>
+                <a
+                  href="/admin/dang-ky"
+                  target="_blank"
+                  className="text-xs text-luxury-gold font-bold hover:underline flex items-center gap-1"
+                >
+                  <span>Mở trang đăng ký</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+
+            {/* Tạo nhanh nhân viên tại đây */}
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                Tạo Nhanh Tài Khoản Quản Trị Viên / Nhân Viên Mới:
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input
+                  type="text"
+                  placeholder="Họ & Tên đệm (VD: Nguyễn)"
+                  value={newAdminLastName}
+                  onChange={(e) => setNewAdminLastName(e.target.value)}
+                  className="h-9 rounded-xl border border-slate-300 px-3 text-xs bg-white focus:outline-none"
+                />
+                <input
+                  type="text"
+                  placeholder="Tên (VD: An)"
+                  value={newAdminFirstName}
+                  onChange={(e) => setNewAdminFirstName(e.target.value)}
+                  className="h-9 rounded-xl border border-slate-300 px-3 text-xs bg-white focus:outline-none"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input
+                  type="email"
+                  placeholder="Email đăng nhập nhân viên"
+                  value={newAdminEmail}
+                  onChange={(e) => setNewAdminEmail(e.target.value)}
+                  className="h-9 rounded-xl border border-slate-300 px-3 text-xs bg-white focus:outline-none"
+                />
+                <input
+                  type="password"
+                  placeholder="Mật khẩu đăng nhập (tối thiểu 6 ký tự)"
+                  value={newAdminPassword}
+                  onChange={(e) => setNewAdminPassword(e.target.value)}
+                  className="h-9 rounded-xl border border-slate-300 px-3 text-xs bg-white focus:outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <Link
+                  href="/admin/nhan-vien"
+                  className="text-xs text-luxury-gold hover:underline font-semibold"
+                >
+                  Quản lý danh sách nhân sự chi tiết →
+                </Link>
+
+                <button
+                  type="button"
+                  disabled={creatingAdmin}
+                  onClick={handleCreateQuickAdmin}
+                  className="btn-gold px-5 py-2 text-xs font-bold rounded-xl shadow-xs"
+                >
+                  {creatingAdmin ? 'Đang tạo...' : '+ Tạo tài khoản Admin mới'}
+                </button>
+              </div>
             </div>
           </div>
         )}

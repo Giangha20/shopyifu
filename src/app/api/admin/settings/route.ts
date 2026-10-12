@@ -51,3 +51,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Lỗi lưu cài đặt' }, { status: 500 });
   }
 }
+
+export async function PATCH(request: NextRequest) {
+  return POST(request);
+}

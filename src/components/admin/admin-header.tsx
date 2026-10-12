@@ -16,8 +16,11 @@ import {
   ExternalLink,
   Clock,
   CheckCircle,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 interface OrderNotification {
   id: string;
@@ -50,7 +53,70 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   const [recentOrders, setRecentOrders] = useState<OrderNotification[]>([]);
   const [pendingCount, setPendingCount] = useState<number>(0);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const previousOrderCountRef = useRef<number>(0);
+  const previousLatestOrderIdRef = useRef<string>('');
+
+  // Load sound setting from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('admin_order_sound_enabled');
+      if (saved !== null) {
+        setSoundEnabled(saved === 'true');
+      }
+    }
+  }, []);
+
+  // Web Audio chime generator (Luxury multi-tone bell)
+  const playOrderChime = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const now = ctx.currentTime;
+      const chords = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+
+      chords.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+        gain.gain.setValueAtTime(0.25, now + idx * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.9);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.12);
+        osc.stop(now + idx * 0.12 + 0.9);
+      });
+    } catch (e) {
+      console.warn('Audio chime playback failed:', e);
+    }
+  };
+
+  const toggleSound = () => {
+    const nextVal = !soundEnabled;
+    setSoundEnabled(nextVal);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('admin_order_sound_enabled', String(nextVal));
+    }
+    if (nextVal) {
+      playOrderChime();
+      toast.success('Đã BẬT âm báo chuông có đơn hàng mới 🔔');
+    } else {
+      toast.info('Đã TẮT âm báo chuông');
+    }
+  };
+
+  const requestNotificationPermission = async () => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission === 'default') {
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') {
+          toast.success('Đã kích hoạt thông báo trên màn hình máy tính!');
+        }
+      }
+    }
+  };
 
   const fetchOrders = async () => {
     try {
@@ -66,12 +132,32 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         setPendingCount(pending > 0 ? pending : orders.length > 0 ? orders.length : 0);
 
         // Check if new orders arrived to alert
+        const newestOrder = orders[0];
         if (
-          previousOrderCountRef.current > 0 &&
-          orders.length > previousOrderCountRef.current
+          newestOrder &&
+          previousLatestOrderIdRef.current &&
+          newestOrder.id !== previousLatestOrderIdRef.current
         ) {
-          // New order arrived!
-          console.log('New order received!');
+          // A brand new order was detected!
+          if (soundEnabled) {
+            playOrderChime();
+          }
+          toast.success(`🔔 ĐƠN HÀNG MỚI #${newestOrder.orderNumber}!`, {
+            description: `${newestOrder.customerName || 'Khách hàng'} - ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(newestOrder.totalAmount)}`,
+            duration: 8000,
+          });
+
+          // Browser Push Notification
+          if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+            new Notification(`🔔 Đơn hàng mới #${newestOrder.orderNumber}!`, {
+              body: `Khách hàng: ${newestOrder.customerName || 'Khách hàng'} - Tổng: ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(newestOrder.totalAmount)}`,
+              icon: '/favicon.ico',
+            });
+          }
+        }
+
+        if (newestOrder) {
+          previousLatestOrderIdRef.current = newestOrder.id;
         }
         previousOrderCountRef.current = orders.length;
       }
@@ -82,9 +168,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
   useEffect(() => {
     fetchOrders();
-    const interval = setInterval(fetchOrders, 20000); // Poll every 20s
+    const interval = setInterval(fetchOrders, 15000); // Poll every 15s for high responsiveness
     return () => clearInterval(interval);
-  }, []);
+  }, [soundEnabled]);
 
   const handleLogout = async () => {
     try {
@@ -188,18 +274,41 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 onClick={() => setNotifOpen(false)}
               />
               <div className="absolute right-0 z-50 mt-2 w-80 sm:w-96 rounded-2xl border border-slate-200 bg-white shadow-2xl animate-fade-in-down overflow-hidden">
-                <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-4 py-3">
+                <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-4 py-2.5">
                   <div className="flex items-center gap-2">
                     <ShoppingBag className="h-4 w-4 text-luxury-gold" />
                     <span className="text-xs font-bold text-slate-900">
-                      Thông Báo Đơn Hàng Mới
+                      Đơn Hàng Mới
                     </span>
+                    {pendingCount > 0 && (
+                      <span className="rounded-full bg-rose-100 px-1.5 py-0.2 text-[10px] font-bold text-rose-700">
+                        {pendingCount}
+                      </span>
+                    )}
                   </div>
-                  {pendingCount > 0 && (
-                    <span className="rounded-full bg-rose-100 px-2 py-0.5 text-2xs font-bold text-rose-700">
-                      {pendingCount} đơn cần xử lý
-                    </span>
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={toggleSound}
+                      className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                        soundEnabled
+                          ? 'bg-amber-100 text-amber-900 hover:bg-amber-200'
+                          : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                      }`}
+                      title={soundEnabled ? 'Bấm để tắt âm thanh chuông báo' : 'Bấm để bật âm thanh chuông báo'}
+                    >
+                      {soundEnabled ? <Volume2 className="h-3 w-3 text-amber-700" /> : <VolumeX className="h-3 w-3 text-slate-500" />}
+                      <span>{soundEnabled ? 'Chuông: BẬT' : 'Chuông: TẮT'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={playOrderChime}
+                      className="px-1.5 py-1 text-[11px] font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded"
+                      title="Bấm để thử nghe chuông báo đơn mới"
+                    >
+                      Thử chuông
+                    </button>
+                  </div>
                 </div>
 
                 <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
@@ -242,14 +351,22 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   )}
                 </div>
 
-                <div className="border-t border-slate-100 bg-slate-50 p-2 text-center">
+                <div className="border-t border-slate-100 bg-slate-50 p-2.5 flex items-center justify-between text-xs">
+                  <button
+                    type="button"
+                    onClick={requestNotificationPermission}
+                    className="text-2xs text-slate-500 hover:text-luxury-gold flex items-center gap-1"
+                    title="Bấm để nhận thông báo nổi trên góc màn hình máy tính"
+                  >
+                    <span>🔔 Bật thông báo máy tính</span>
+                  </button>
                   <Link
                     href="/admin/don-hang"
                     onClick={() => setNotifOpen(false)}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-luxury-gold hover:text-slate-900 transition-colors"
+                    className="inline-flex items-center gap-1 text-2xs font-semibold text-luxury-gold hover:text-slate-900 transition-colors"
                   >
-                    <span>Xem tất cả danh sách đơn hàng</span>
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    <span>Xem tất cả đơn hàng</span>
+                    <ExternalLink className="h-3 w-3" />
                   </Link>
                 </div>
               </div>

@@ -291,12 +291,22 @@ export function Header() {
             {/* LOGO */}
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="group flex flex-col items-center text-center">
-                <span className="font-serif text-2xl sm:text-3xl font-black tracking-widest text-luxury-black group-hover:text-luxury-gold transition-colors">
-                  {settings.storeName || 'LUXE'}
-                </span>
-                <span className="text-[9px] uppercase tracking-[0.3em] text-luxury-gold font-sans font-semibold -mt-1">
-                  {settings.storeSlogan ? 'Haute Couture' : 'Haute Couture'}
-                </span>
+                {settings.storeLogo ? (
+                  <img
+                    src={settings.storeLogo}
+                    alt={settings.storeName || 'LUXE'}
+                    className="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105"
+                  />
+                ) : (
+                  <>
+                    <span className="font-serif text-2xl sm:text-3xl font-black tracking-widest text-luxury-black group-hover:text-luxury-gold transition-colors">
+                      {settings.storeName || 'LUXE'}
+                    </span>
+                    <span className="text-[9px] uppercase tracking-[0.3em] text-luxury-gold font-sans font-semibold -mt-1">
+                      {settings.storeSlogan || 'Haute Couture'}
+                    </span>
+                  </>
+                )}
               </Link>
             </div>
 
@@ -671,9 +681,15 @@ export function Header() {
                 <Link
                   href="/"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="font-serif text-xl font-black tracking-widest text-luxury-black"
+                  className="flex items-center"
                 >
-                  LUXE <span className="text-luxury-gold text-xs font-sans tracking-widest">SHOP</span>
+                  {settings.storeLogo ? (
+                    <img src={settings.storeLogo} alt={settings.storeName || 'Logo'} className="h-8 w-auto object-contain" />
+                  ) : (
+                    <span className="font-serif text-xl font-black tracking-widest text-luxury-black">
+                      {settings.storeName || 'LUXE'} <span className="text-luxury-gold text-xs font-sans tracking-widest">SHOP</span>
+                    </span>
+                  )}
                 </Link>
                 <button
                   type="button"

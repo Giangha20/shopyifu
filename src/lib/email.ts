@@ -1,6 +1,5 @@
-// ========================================
-// LUXE SHOP - Email Notification Service
-// ========================================
+import nodemailer from 'nodemailer';
+import { prisma } from '@/lib/db';
 
 export interface EmailOptions {
   to: string;
@@ -19,7 +18,7 @@ const DEFAULT_FROM = process.env.EMAIL_FROM || 'LUXE SHOP <noreply@luxeshop.vn>'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 /**
- * Primary email dispatcher supporting Resend API, SMTP, or console simulation
+ * Primary email dispatcher supporting Nodemailer (Gmail / custom SMTP), Resend API, or console simulation
  */
 export async function sendEmail({
   to,
@@ -27,16 +26,85 @@ export async function sendEmail({
   html,
   from = DEFAULT_FROM,
 }: EmailOptions): Promise<EmailResult> {
-  const provider = process.env.EMAIL_PROVIDER || (process.env.RESEND_API_KEY ? 'resend' : 'simulated');
+  // 1. Check database settings for custom SMTP / Gmail configuration
+  let smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+  let smtpPort = Number(process.env.SMTP_PORT) || 465;
+  let smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER || '';
+  let smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || '';
+  let smtpSecure = process.env.SMTP_SECURE === 'true' || smtpPort === 465;
+  let fromName = 'LUXE SHOP';
 
-  // 1. Resend Provider via HTTP REST API
-  if (provider === 'resend' || process.env.RESEND_API_KEY) {
+  try {
+    const settingsList = await prisma.storeSetting.findMany({
+      where: {
+        key: {
+          in: ['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_secure', 'smtp_from_name', 'store_name'],
+        },
+      },
+    });
+
+    const setMap: Record<string, string> = {};
+    settingsList.forEach((s) => {
+      setMap[s.key] = s.value;
+    });
+
+    if (setMap['smtp_host']) smtpHost = setMap['smtp_host'];
+    if (setMap['smtp_port']) smtpPort = Number(setMap['smtp_port']) || 465;
+    if (setMap['smtp_user']) smtpUser = setMap['smtp_user'];
+    if (setMap['smtp_pass']) smtpPass = setMap['smtp_pass'];
+    if (setMap['smtp_secure']) smtpSecure = setMap['smtp_secure'] === 'true' || smtpPort === 465;
+    if (setMap['smtp_from_name'] || setMap['store_name']) {
+      fromName = setMap['smtp_from_name'] || setMap['store_name'];
+    }
+  } catch (dbErr) {
+    // If DB read fails, continue with env vars
+    console.warn('Could not read email settings from DB, using env:', dbErr);
+  }
+
+  // 2. If SMTP / Gmail credentials are configured, send with Nodemailer
+  if (smtpUser && smtpPass) {
+    try {
+      const isGmail = smtpHost.includes('gmail') || smtpUser.includes('@gmail.com');
+      const transporter = nodemailer.createTransport(
+        isGmail
+          ? {
+              service: 'gmail',
+              auth: {
+                user: smtpUser,
+                pass: smtpPass,
+              },
+            }
+          : {
+              host: smtpHost,
+              port: smtpPort,
+              secure: smtpSecure,
+              auth: {
+                user: smtpUser,
+                pass: smtpPass,
+              },
+            }
+      );
+
+      const fromAddress = `"${fromName}" <${smtpUser}>`;
+      const info = await transporter.sendMail({
+        from: fromAddress,
+        to,
+        subject,
+        html,
+      });
+
+      console.log(`✉️ Email successfully dispatched via Nodemailer (${smtpHost}) to ${to}: ${subject} (ID: ${info.messageId})`);
+      return { success: true, id: info.messageId };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      console.error('Failed to send email via Nodemailer SMTP, trying fallbacks:', errorMsg);
+    }
+  }
+
+  // 3. Resend Provider via HTTP REST API (Fallback if RESEND_API_KEY is present)
+  if (process.env.RESEND_API_KEY) {
     try {
       const apiKey = process.env.RESEND_API_KEY;
-      if (!apiKey) {
-        throw new Error('RESEND_API_KEY is not defined');
-      }
-
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -44,7 +112,7 @@ export async function sendEmail({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from,
+          from: from || `"${fromName}" <noreply@luxeshop.vn>`,
           to,
           subject,
           html,
@@ -60,16 +128,16 @@ export async function sendEmail({
       return { success: true, id: data.id };
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err);
-      console.error('Failed to send email via Resend, falling back:', errorMsg);
+      console.error('Failed to send email via Resend:', errorMsg);
     }
   }
 
-  // 2. Simulated / Development Console Fallback
+  // 4. Simulated / Development Console Fallback
   console.log('====================================================');
-  console.log(`✉️ [EMAIL SIMULATION]`);
+  console.log(`✉️ [EMAIL SIMULATION (Configure Gmail SMTP in Admin Settings to send real emails)]`);
   console.log(`To: ${to}`);
   console.log(`Subject: ${subject}`);
-  console.log(`From: ${from}`);
+  console.log(`From: "${fromName}" <${smtpUser || 'system@luxeshop.vn'}>`);
   console.log('====================================================');
 
   return {
@@ -307,5 +375,87 @@ export function getOrderStatusUpdateEmail(
     `Đơn hàng #${orderNumber} đã chuyển sang trạng thái: ${newStatusText}`
   );
 
+  return { subject, html };
+}
+
+export function getAdminNewOrderAlertEmail(order: OrderEmailData): { subject: string; html: string } {
+  const formatMoney = (amount: number) =>
+    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+
+  const subject = `🔔 [ĐƠN HÀNG MỚI] #${order.orderNumber} - ${order.shippingName} (${formatMoney(order.totalAmount)})`;
+  
+  const itemsHtml = order.items
+    .map(
+      (item) => `
+    <tr>
+      <td style="padding: 10px 8px; border-bottom: 1px solid #f1f5f9;">
+        <strong>${item.productName}</strong>
+        ${item.variantName ? `<br><span style="font-size: 11px; color: #64748b;">${item.variantName}</span>` : ''}
+      </td>
+      <td style="padding: 10px 8px; text-align: center; border-bottom: 1px solid #f1f5f9;">x${item.quantity}</td>
+      <td style="padding: 10px 8px; text-align: right; border-bottom: 1px solid #f1f5f9; font-weight: 600;">${formatMoney(item.totalPrice)}</td>
+    </tr>
+  `
+    )
+    .join('');
+
+  const html = baseLayout(
+    `
+    <h2 class="title" style="color: #b45309;">🔔 Có đơn hàng mới trên Website!</h2>
+    <p>Hệ thống vừa tiếp nhận đơn hàng <strong>#${order.orderNumber}</strong> từ khách hàng <strong>${order.shippingName}</strong>.</p>
+    
+    <div class="card" style="background-color: #fffbeb; border-color: #fde68a;">
+      <p style="margin: 0 0 6px 0; font-size: 13px;"><strong>Khách hàng:</strong> ${order.shippingName} | <a href="tel:${order.shippingPhone}">${order.shippingPhone}</a></p>
+      <p style="margin: 0 0 6px 0; font-size: 13px;"><strong>Địa chỉ nhận:</strong> ${order.shippingAddress}</p>
+      <p style="margin: 0; font-size: 13px;"><strong>Thanh toán:</strong> ${order.paymentMethod === 'BANK_TRANSFER' ? 'Chuyển khoản ngân hàng' : 'Thanh toán khi nhận hàng (COD)'}</p>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;">
+      <thead>
+        <tr style="border-bottom: 2px solid #e2e8f0; text-align: left;">
+          <th style="padding: 8px;">Sản phẩm</th>
+          <th style="padding: 8px; text-align: center;">SL</th>
+          <th style="padding: 8px; text-align: right;">Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${itemsHtml}
+      </tbody>
+      <tfoot>
+        <tr style="border-top: 2px solid #0f172a;">
+          <td colspan="2" style="padding: 12px 8px; text-align: right; font-weight: 700;">Tổng tiền thu:</td>
+          <td style="padding: 12px 8px; text-align: right; font-weight: 700; color: #b45309; font-size: 16px;">${formatMoney(order.totalAmount)}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="button-container">
+      <a href="${APP_URL}/admin/don-hang" class="btn-gold">XỬ LÝ ĐƠN HÀNG TRÊN ADMIN</a>
+    </div>
+    `,
+    `Có đơn hàng mới #${order.orderNumber} trị giá ${formatMoney(order.totalAmount)}`
+  );
+
+  return { subject, html };
+}
+
+export function getTestEmail(recipientEmail: string): { subject: string; html: string } {
+  const subject = `[THỬ NGHIỆM GMAIL] Cấu hình Email gửi thông báo thành công! - LUXE SHOP`;
+  const html = baseLayout(
+    `
+    <h2 class="title" style="color: #15803d;">🎉 Kết Nối Gửi Email Thành Công!</h2>
+    <p>Xin chào Quản trị viên,</p>
+    <p>Hệ thống gửi thư điện tử thông qua <strong>Gmail / SMTP</strong> của website LUXE SHOP đã được kết nối và hoạt động chính xác 100%.</p>
+    <div class="card" style="background-color: #f0fdf4; border-color: #bbf7d0;">
+      <p style="margin: 0 0 6px 0; font-size: 13px; color: #166534;">✓ Máy chủ gửi thư đã được xác thực an toàn.</p>
+      <p style="margin: 0 0 6px 0; font-size: 13px; color: #166534;">✓ Các thông báo đăng ký tài khoản mới và thông báo đơn hàng sẽ được tự động gửi về hộp thư này.</p>
+      <p style="margin: 0; font-size: 12px; color: #64748b;">Thời gian kiểm tra: ${new Date().toLocaleString('vi-VN')}</p>
+    </div>
+    <div class="button-container">
+      <a href="${APP_URL}/admin/cai-dat" class="btn-gold">QUAY LẠI TRANG CÀI ĐẶT</a>
+    </div>
+    `,
+    'Cấu hình gửi email thông báo đơn hàng và đăng ký thành công'
+  );
   return { subject, html };
 }

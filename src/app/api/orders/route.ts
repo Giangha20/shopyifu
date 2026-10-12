@@ -349,6 +349,64 @@ export async function POST(request: NextRequest) {
       request
     );
 
+    // Asynchronously dispatch Order Confirmation Email & Admin Alert
+    (async () => {
+      try {
+        const { sendEmail, getOrderConfirmationEmail, getAdminNewOrderAlertEmail } = await import('@/lib/email');
+
+        let customerEmail = data.shippingEmail;
+        if (!customerEmail && userId) {
+          const userRec = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+          customerEmail = userRec?.email;
+        }
+
+        const emailOrderData = {
+          orderNumber: order.orderNumber,
+          shippingName: data.shippingName,
+          shippingPhone: data.shippingPhone,
+          shippingAddress: `${data.shippingStreet}, ${data.shippingWard}, ${data.shippingDistrict}, ${data.shippingProvince}`,
+          paymentMethod: data.paymentMethod,
+          subtotal: Number(order.subtotal),
+          shippingFee: Number(order.shippingFee),
+          discountAmount: Number(order.discountAmount),
+          totalAmount: Number(order.totalAmount),
+          items: order.items.map((it: any) => ({
+            productName: it.productName,
+            variantName: it.variantName,
+            quantity: it.quantity,
+            unitPrice: Number(it.unitPrice),
+            totalPrice: Number(it.totalPrice),
+          })),
+        };
+
+        // 1. Send confirmation email to customer
+        if (customerEmail) {
+          const custEmail = getOrderConfirmationEmail(emailOrderData);
+          await sendEmail({
+            to: customerEmail,
+            subject: custEmail.subject,
+            html: custEmail.html,
+          });
+        }
+
+        // 2. Send order alert email to Admin
+        const adminSetting = await prisma.storeSetting.findUnique({
+          where: { key: 'admin_notify_email' },
+        });
+        const adminEmail = adminSetting?.value || process.env.ADMIN_NOTIFY_EMAIL;
+        if (adminEmail) {
+          const adminAlert = getAdminNewOrderAlertEmail(emailOrderData);
+          await sendEmail({
+            to: adminEmail,
+            subject: adminAlert.subject,
+            html: adminAlert.html,
+          });
+        }
+      } catch (err) {
+        console.warn('Order email notification async error:', err);
+      }
+    })();
+
     return NextResponse.json(
       {
         message: 'Đặt hàng thành công',

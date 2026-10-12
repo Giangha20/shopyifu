@@ -61,6 +61,20 @@ export async function POST(request: NextRequest) {
     // Audit log
     await logAudit(newUser.id, 'register', 'user', newUser.id, { email: normalizedEmail }, request);
 
+    // Send Welcome Email asynchronously
+    try {
+      const { sendEmail, getWelcomeEmail } = await import('@/lib/email');
+      const fullName = `${newUser.firstName} ${newUser.lastName}`.trim();
+      const emailContent = getWelcomeEmail(fullName || 'Quý khách');
+      sendEmail({
+        to: normalizedEmail,
+        subject: emailContent.subject,
+        html: emailContent.html,
+      }).catch((e) => console.warn('Welcome email dispatch error:', e));
+    } catch (emailErr) {
+      console.warn('Welcome email import error:', emailErr);
+    }
+
     return NextResponse.json(
       {
         message: 'Đăng ký tài khoản thành công',

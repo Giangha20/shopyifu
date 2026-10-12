@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -151,8 +152,16 @@ export default function AdminLoginPage() {
           </form>
 
           {/* Footer note */}
-          <div className="mt-8 border-t border-white/5 pt-4 text-center text-2xs text-slate-500">
-            Khu vực giới hạn. Tất cả các phiên đăng nhập đều được lưu lại nhật ký bảo mật.
+          <div className="mt-8 border-t border-white/5 pt-4 text-center text-2xs text-slate-400 space-y-2">
+            <div>
+              Chưa có tài khoản quản trị?{' '}
+              <Link href="/admin/dang-ky" className="text-luxury-gold hover:underline font-semibold">
+                Đăng ký Quản trị viên
+              </Link>
+            </div>
+            <div className="text-slate-500">
+              Khu vực giới hạn. Tất cả các phiên đăng nhập đều được lưu lại nhật ký bảo mật.
+            </div>
           </div>
         </div>
       </div>
