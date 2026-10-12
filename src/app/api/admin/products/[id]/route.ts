@@ -194,8 +194,12 @@ export async function PATCH(
           isNew: data.isNew,
           isBestseller: data.isBestseller,
           metaTitle: data.metaTitle,
-          metaDescription: data.metaDescription,
-          isRentable: data.isRentable !== undefined ? data.isRentable : undefined,
+          isRentable:
+            body.isRentable !== undefined
+              ? Boolean(body.isRentable === true || body.isRentable === 'true')
+              : data.isRentable !== undefined
+              ? data.isRentable
+              : undefined,
           rentalPricePerDay: data.rentalPricePerDay !== undefined ? toDecimal(data.rentalPricePerDay) : undefined,
           rentalDepositFee: data.rentalDepositFee !== undefined ? toDecimal(data.rentalDepositFee) : undefined,
           rentalTerms: data.rentalTerms !== undefined ? data.rentalTerms : undefined,

@@ -82,25 +82,16 @@ export default function ThueDoPage() {
     async function loadProducts() {
       try {
         setLoading(true);
-        // First try getting explicitly rentable products
+        // Only get explicitly rentable products
         const res = await fetch('/api/rentals');
         const data = await res.json();
         
-        if (data.products && data.products.length > 0) {
-          setProducts(data.products);
+        if (data.products && Array.isArray(data.products)) {
+          // Strictly only items with isRentable = true
+          const validRentables = data.products.filter((p: any) => p.isRentable);
+          setProducts(validRentables);
         } else {
-          // If no explicitly rentable product exists yet, fetch active products as rentable showcase
-          const fallbackRes = await fetch('/api/products?limit=24');
-          const fallbackData = await fallbackRes.json();
-          if (fallbackData.products) {
-            // Add virtual rental prices if not present
-            const enhanced = fallbackData.products.map((p: any) => ({
-              ...p,
-              rentalPricePerDay: p.rentalPricePerDay || Math.round(Number(p.price) * 0.15),
-              rentalDepositFee: p.rentalDepositFee || Math.round(Number(p.price) * 0.7),
-            }));
-            setProducts(enhanced);
-          }
+          setProducts([]);
         }
       } catch (err) {
         console.error('Failed to load rental items:', err);

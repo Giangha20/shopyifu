@@ -104,9 +104,9 @@ export const productSchema = z.object({
   metaTitle: z.string().max(255).optional().nullable(),
   metaDescription: z.string().max(500).optional().nullable(),
   categoryIds: z.array(z.string()).optional(),
-  isRentable: z.boolean().optional(),
-  rentalPricePerDay: z.number().min(0).optional().nullable(),
-  rentalDepositFee: z.number().min(0).optional().nullable(),
+  isRentable: z.union([z.boolean(), z.string().transform((v) => v === 'true')]).optional(),
+  rentalPricePerDay: z.coerce.number().min(0).optional().nullable(),
+  rentalDepositFee: z.coerce.number().min(0).optional().nullable(),
   rentalTerms: z.string().optional().nullable(),
 });
 

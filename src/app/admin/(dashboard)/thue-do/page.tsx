@@ -99,6 +99,7 @@ export default function AdminThueDoPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [productSearch, setProductSearch] = useState('');
+  const [rentalFilter, setRentalFilter] = useState<'ALL' | 'RENTABLE' | 'NON_RENTABLE'>('ALL');
 
   // Tab 2: Add / Upload new rentable product modal
   const [isAddRentalOpen, setIsAddRentalOpen] = useState(false);
@@ -244,23 +245,29 @@ export default function AdminThueDoPage() {
   const handleToggleRentable = async (prod: Product) => {
     try {
       const newStatus = !prod.isRentable;
+      const payload: any = { isRentable: newStatus };
+      if (newStatus) {
+        const pPrice = Number(prod.price) || 0;
+        payload.rentalPricePerDay = prod.rentalPricePerDay ? Number(prod.rentalPricePerDay) : Math.round(pPrice * 0.15);
+        payload.rentalDepositFee = prod.rentalDepositFee ? Number(prod.rentalDepositFee) : Math.round(pPrice * 0.7);
+      }
+
       const res = await fetch(`/api/admin/products/${prod.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          isRentable: newStatus,
-          rentalPricePerDay: prod.rentalPricePerDay || Math.round(Number(prod.price) * 0.15),
-          rentalDepositFee: prod.rentalDepositFee || Math.round(Number(prod.price) * 0.7),
-        }),
+        body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error('Không thể cập nhật trạng thái thuê');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Không thể cập nhật trạng thái thuê');
+      }
       toast.success(newStatus ? 'Đã bật chế độ cho thuê' : 'Đã tắt chế độ cho thuê');
       setProducts((prev) =>
         prev.map((p) => (p.id === prod.id ? { ...p, isRentable: newStatus } : p))
       );
     } catch (err: any) {
-      toast.error(err.message || 'Lỗi khi cập nhật');
+      toast.error(err.message || 'Lỗi khi cập nhật trạng thái thuê');
     }
   };
 
@@ -713,16 +720,55 @@ export default function AdminThueDoPage() {
       {activeTab === 'products' && (
         <div className="space-y-4">
           <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Tìm sản phẩm theo tên, SKU..."
-                value={productSearch}
-                onChange={(e) => setProductSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-luxury-gold/40"
-              />
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Tìm sản phẩm theo tên, SKU..."
+                  value={productSearch}
+                  onChange={(e) => setProductSearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-luxury-gold/40"
+                />
+              </div>
+
+              <div className="flex items-center gap-1.5 bg-slate-100/80 p-1 rounded-xl text-xs">
+                <button
+                  type="button"
+                  onClick={() => setRentalFilter('ALL')}
+                  className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                    rentalFilter === 'ALL'
+                      ? 'bg-white text-luxury-black shadow-sm'
+                      : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                >
+                  Tất cả ({products.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRentalFilter('RENTABLE')}
+                  className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                    rentalFilter === 'RENTABLE'
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-emerald-700 hover:text-emerald-900'
+                  }`}
+                >
+                  Đang bật thuê ({products.filter((p) => p.isRentable).length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRentalFilter('NON_RENTABLE')}
+                  className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                    rentalFilter === 'NON_RENTABLE'
+                      ? 'bg-slate-700 text-white shadow-sm'
+                      : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                >
+                  Đang tắt ({products.filter((p) => !p.isRentable).length})
+                </button>
+              </div>
             </div>
+
             <div className="flex items-center gap-3">
               <button
                 type="button"
@@ -753,11 +799,16 @@ export default function AdminThueDoPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {products
-                      .filter((p) =>
-                        !productSearch ||
-                        p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
-                        p.sku.toLowerCase().includes(productSearch.toLowerCase())
-                      )
+                      .filter((p) => {
+                        const matchesSearch =
+                          !productSearch ||
+                          p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
+                          p.sku.toLowerCase().includes(productSearch.toLowerCase());
+                        if (!matchesSearch) return false;
+                        if (rentalFilter === 'RENTABLE') return p.isRentable;
+                        if (rentalFilter === 'NON_RENTABLE') return !p.isRentable;
+                        return true;
+                      })
                       .map((prod) => (
                         <tr key={prod.id} className="hover:bg-slate-50/70 transition-colors">
                           <td className="p-4">
