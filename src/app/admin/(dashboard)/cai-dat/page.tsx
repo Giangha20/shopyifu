@@ -457,6 +457,39 @@ export default function AdminSettingsPage() {
                   <p className="text-[11px] text-slate-400">Khuyên dùng ảnh định dạng PNG nền trong suốt, kích thước tỷ lệ 4:1 (khoảng 240x60px).</p>
                 </div>
               </div>
+
+              {/* Live Preview: Both Logo and Brand Name */}
+              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    Xem trước thực tế trên Header website (Hiện cả Logo lẫn Tên thương hiệu):
+                  </span>
+                  <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    Đồng thời Logo + Chữ
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-slate-50/80 rounded-xl border border-slate-100">
+                  {settings.store_logo ? (
+                    <img
+                      src={settings.store_logo}
+                      alt="Logo preview"
+                      className="h-10 w-auto max-w-[120px] object-contain"
+                    />
+                  ) : (
+                    <div className="h-10 w-10 rounded-lg bg-luxury-gold/20 flex items-center justify-center text-luxury-gold font-bold text-base">
+                      {(settings.store_name || 'L').charAt(0)}
+                    </div>
+                  )}
+                  <div className="flex flex-col text-left">
+                    <span className="font-serif text-xl sm:text-2xl font-black tracking-widest text-luxury-black leading-tight">
+                      {settings.store_name || 'LUXE'}
+                    </span>
+                    <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.25em] text-luxury-gold font-sans font-semibold">
+                      {settings.store_slogan || 'Haute Couture'}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* FAVICON SHOP */}

@@ -24,6 +24,7 @@ import {
   Shirt,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useStoreSettings } from '@/hooks/use-settings';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -80,6 +81,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   currentUser,
 }) => {
   const pathname = usePathname();
+  const { settings } = useStoreSettings();
 
   const isLinkActive = (href: string) => {
     if (href === '/admin') return pathname === '/admin';
@@ -107,14 +109,22 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {/* Brand Header */}
         <div className="flex h-16 items-center justify-between border-b border-white/10 px-6">
           <Link href="/admin" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-luxury-gold text-luxury-black font-bold text-lg shadow-glow">
-              L
-            </div>
-            <div>
-              <span className="font-serif text-lg font-bold tracking-wider text-white">
-                LUXE SHOP
+            {settings.storeLogo ? (
+              <img
+                src={settings.storeLogo}
+                alt={settings.storeName || 'Logo'}
+                className="h-8 w-auto max-w-[36px] object-contain rounded-md"
+              />
+            ) : (
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-luxury-gold text-luxury-black font-bold text-lg shadow-glow">
+                {(settings.storeName || 'L').charAt(0)}
+              </div>
+            )}
+            <div className="flex flex-col text-left">
+              <span className="font-serif text-base font-bold tracking-wider text-white line-clamp-1">
+                {settings.storeName || 'LUXE SHOP'}
               </span>
-              <span className="block text-2xs uppercase tracking-widest text-luxury-gold font-semibold">
+              <span className="block text-[9px] uppercase tracking-widest text-luxury-gold font-semibold">
                 Admin Panel
               </span>
             </div>

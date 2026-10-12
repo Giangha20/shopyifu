@@ -100,13 +100,22 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12 pb-12 border-b border-white/10">
           {/* Column 1: Brand Info (takes 2 cols on lg) */}
           <div className="lg:col-span-2 space-y-5">
-            <Link href="/" className="inline-block">
-              <span className="font-serif text-3xl font-black tracking-widest text-white">
-                {settings.storeName || 'LUXE'}
-              </span>
-              <span className="block text-[10px] uppercase tracking-[0.3em] text-luxury-gold font-sans font-semibold">
-                {settings.storeSlogan ? 'Haute Couture' : 'Haute Couture'}
-              </span>
+            <Link href="/" className="inline-flex items-center gap-3 group">
+              {settings.storeLogo && (
+                <img
+                  src={settings.storeLogo}
+                  alt={settings.storeName || 'Logo'}
+                  className="h-10 w-auto max-w-[110px] object-contain rounded-md"
+                />
+              )}
+              <div className="flex flex-col text-left">
+                <span className="font-serif text-2xl sm:text-3xl font-black tracking-widest text-white group-hover:text-luxury-gold transition-colors">
+                  {settings.storeName || 'LUXE'}
+                </span>
+                <span className="block text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-luxury-gold font-sans font-semibold">
+                  {settings.storeSlogan || 'Haute Couture'}
+                </span>
+              </div>
             </Link>
 
             <p className="text-sm text-slate-400 leading-relaxed max-w-sm">

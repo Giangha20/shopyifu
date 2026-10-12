@@ -288,25 +288,24 @@ export function Header() {
               </button>
             </div>
 
-            {/* LOGO */}
+            {/* LOGO & BRAND NAME */}
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="group flex flex-col items-center text-center">
-                {settings.storeLogo ? (
+              <Link href="/" className="group flex items-center gap-2.5 sm:gap-3 text-left">
+                {settings.storeLogo && (
                   <img
                     src={settings.storeLogo}
-                    alt={settings.storeName || 'LUXE'}
-                    className="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105"
+                    alt={settings.storeName || 'Logo'}
+                    className="h-9 sm:h-11 w-auto max-w-[120px] object-contain transition-transform group-hover:scale-105"
                   />
-                ) : (
-                  <>
-                    <span className="font-serif text-2xl sm:text-3xl font-black tracking-widest text-luxury-black group-hover:text-luxury-gold transition-colors">
-                      {settings.storeName || 'LUXE'}
-                    </span>
-                    <span className="text-[9px] uppercase tracking-[0.3em] text-luxury-gold font-sans font-semibold -mt-1">
-                      {settings.storeSlogan || 'Haute Couture'}
-                    </span>
-                  </>
                 )}
+                <div className="flex flex-col">
+                  <span className="font-serif text-xl sm:text-2xl font-black tracking-widest text-luxury-black group-hover:text-luxury-gold transition-colors leading-tight">
+                    {settings.storeName || 'LUXE'}
+                  </span>
+                  <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.25em] text-luxury-gold font-sans font-semibold">
+                    {settings.storeSlogan || 'Haute Couture'}
+                  </span>
+                </div>
               </Link>
             </div>
 
@@ -681,15 +680,19 @@ export function Header() {
                 <Link
                   href="/"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center"
+                  className="flex items-center gap-2.5 text-left"
                 >
-                  {settings.storeLogo ? (
-                    <img src={settings.storeLogo} alt={settings.storeName || 'Logo'} className="h-8 w-auto object-contain" />
-                  ) : (
-                    <span className="font-serif text-xl font-black tracking-widest text-luxury-black">
-                      {settings.storeName || 'LUXE'} <span className="text-luxury-gold text-xs font-sans tracking-widest">SHOP</span>
-                    </span>
+                  {settings.storeLogo && (
+                    <img src={settings.storeLogo} alt={settings.storeName || 'Logo'} className="h-8 w-auto max-w-[80px] object-contain" />
                   )}
+                  <div className="flex flex-col">
+                    <span className="font-serif text-lg font-black tracking-wider text-luxury-black leading-tight">
+                      {settings.storeName || 'LUXE'}
+                    </span>
+                    <span className="text-[8px] uppercase tracking-widest text-luxury-gold font-semibold">
+                      {settings.storeSlogan || 'SHOP'}
+                    </span>
+                  </div>
                 </Link>
                 <button
                   type="button"
