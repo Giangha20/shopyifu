@@ -1,0 +1,82 @@
+================================================================================
+          HƯỚNG DẪN CÀI ĐẶT & SỬ DỤNG NHANH WEBSITE YIFU SHOP
+                (DÀNH CHO NGƯỜI MỚI BẮT ĐẦU - TỪ A ĐẾN Z)
+================================================================================
+
+Chào mừng bạn đã sở hữu mã nguồn Website Thương Mại Điện Tử YIFU SHOP!
+Dù bạn không biết lập trình, chỉ cần làm theo các bước dưới đây là thành công 100%.
+
+--------------------------------------------------------------------------------
+CÁCH 1: CHẠY THỬ TRÊN MÁY TÍNH TRONG 2 CÚ CLICK CHUỘT
+--------------------------------------------------------------------------------
+1. Cài Node.js (nếu máy chưa có):
+   - Vào web: https://nodejs.org
+   - Tải bản "LTS" về và cài đặt (bấm Next liên tục).
+
+2. Bắt đầu chạy:
+   - Bước 1: Nhấp đúp chuột vào file: 1-CAI-DAT-TU-DONG.bat (chờ 1-2 phút)
+   - Bước 2: Nhấp đúp chuột vào file: 2-CHAY-THU-LOCAL.bat
+   - Mở trình duyệt web vào:
+     + Trang bán hàng: http://localhost:3000
+     + Trang quản trị Admin: http://localhost:3000/admin/login
+       * Email Admin: giangshop@gmail.com
+       * Mật khẩu: GiangShop@2026!
+
+--------------------------------------------------------------------------------
+CÁCH 2: ĐƯA WEBSITE LÊN MẠNG INTERNET 24/7 MIỄN PHÍ (VERCEL + NEON)
+--------------------------------------------------------------------------------
+1. Tạo Database miễn phí tại Neon.tech:
+   - Vào https://neon.tech -> Đăng ký bằng Google.
+   - Bấm Create Project -> Copy dòng chữ "Connection String" (dạng: postgresql://...)
+   
+2. Đưa mã nguồn lên GitHub:
+   - Đăng ký tài khoản tại https://github.com
+   - Tạo 1 Repository mới (đặt tên ví dụ: shopyifu).
+   - Nhấp đúp chuột vào file: PUSH_LEN_GITHUB.bat để tải toàn bộ web lên GitHub.
+
+3. Đưa lên Vercel:
+   - Vào https://vercel.com -> Đăng nhập bằng tài khoản GitHub.
+   - Bấm "Add New..." -> "Project" -> Chọn repository "shopyifu".
+   - Tại mục Environment Variables (Biến môi trường), thêm các dòng:
+     * DATABASE_URL = (Dán link Connection String của Neon ở bước 1)
+     * NEXTAUTH_SECRET = YIFU_SHOP_SECRET_SECURITY_KEY_2026
+     * NEXTAUTH_URL = https://ten-shop-cua-ban.vercel.app
+     * ADMIN_EMAIL = giangshop@gmail.com
+     * ADMIN_PASSWORD = GiangShop@2026!
+   - Bấm "Deploy" -> Sau 1-2 phút bạn có ngay link website chạy 24/7!
+
+--------------------------------------------------------------------------------
+CÁCH GẮN TÊN MIỀN RIÊNG BẠN ĐÃ MUA (VÍ DỤ: YIFUSHOP.COM)
+--------------------------------------------------------------------------------
+1. Thêm tên miền vào Vercel:
+   - Đăng nhập Vercel -> Bấm vào website của bạn -> Settings -> Domains.
+   - Nhập tên miền (ví dụ: yifushop.com) -> Bấm "Add".
+   - Chọn mục: "Add yifushop.com and redirect www.yifushop.com to it".
+
+2. Cài đặt 2 bản ghi DNS tại nơi bạn mua tên miền (Tenten, Mắt Bão, PA, Namecheap...):
+   - Bản ghi 1:
+     + Loại (Type): A
+     + Tên (Host): @ (hoặc để trống)
+     + Giá trị (Value): 76.76.21.21
+   - Bản ghi 2:
+     + Loại (Type): CNAME
+     + Tên (Host): www
+     + Giá trị (Value): cname.vercel-dns.com
+
+3. Chờ 5 - 15 phút:
+   - Vercel sẽ tự động cấp chứng chỉ bảo mật SSL (https://) miễn phí trọn đời.
+   - Bạn truy cập https://yifushop.com là vào thẳng web!
+
+--------------------------------------------------------------------------------
+THÔNG TIN QUẢN TRỊ & BẢO MẬT QUAN TRỌNG
+--------------------------------------------------------------------------------
+- Trang đăng nhập quản trị: /admin/login
+- Trang đăng ký Admin nội bộ (có khóa): /admin/dang-ky
+  * Mã khóa bí mật: YIFU@ADMIN2026
+- Đổi tên shop, thay Logo, thay Favicon: Vào /admin/cai-dat
+- Chuông báo đơn hàng: Bật chuông ở góc trên bên phải thanh tiêu đề Admin.
+- Quản lý kho hàng & Upload file CSV: Vào /admin/kho-hang
+- Quản lý thuê đồ & Duyệt cọc: Vào /admin/thue-do
+
+(Xem thêm chi tiết đầy đủ có hình minh họa tại file: HUONG_DAN_CAI_DAT_CHI_TIET.md)
+================================================================================

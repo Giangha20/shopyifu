@@ -1,20 +1,20 @@
 @echo off
 chcp 65001 > nul
 title Đang tải mã nguồn lên GitHub...
-cd /d "C:\Users\giang\.gemini\antigravity\scratch\luxe-shop"
+cd /d "%~dp0"
 
 echo ====================================================================
-echo         ĐANG ĐẨY MÃ NGUỒN LÊN GITHUB (Giangha20/shopyifu)
+echo         ĐANG ĐẨY MÃ NGUỒN LÊN GITHUB
 echo ====================================================================
 echo.
 echo [1/2] Đang kiểm tra và gom tất cả file mã nguồn...
-"C:\Program Files\Git\cmd\git.exe" add .
-"C:\Program Files\Git\cmd\git.exe" commit -m "feat: cap nhat toan bo ma nguon LUXE SHOP" 2>nul
+git add .
+git commit -m "feat: cap nhat toan bo ma nguon YIFU SHOP" 2>nul
 
 echo [2/2] Đang đẩy (Push) lên GitHub...
 echo (Lưu ý: Nếu xuất hiện cửa sổ hỏi đăng nhập GitHub, bạn chỉ cần bấm "Sign in with your browser" hoặc "Authorize")
 echo.
-"C:\Program Files\Git\cmd\git.exe" push -u origin main --force
+git push -u origin main
 
 echo.
 echo ====================================================================
