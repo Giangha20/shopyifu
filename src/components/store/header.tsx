@@ -174,7 +174,8 @@ export function Header() {
   const navLinks = [
     { label: 'Trang chủ', href: '/' },
     { label: 'Sản phẩm', href: '/san-pham', hasMega: true },
-    { label: 'Bộ sưu tập mới', href: '/san-pham?sort=new', badge: 'Mới' },
+    { label: 'Thuê đồ', href: '/thue-do', badge: 'Hot' },
+    { label: 'Bộ sưu tập mới', href: '/san-pham?sort=new' },
     { label: 'Bán chạy', href: '/san-pham?sort=bestseller' },
     { label: 'Khuyến mãi', href: '/san-pham?sort=discount', isSpecial: true },
     { label: 'Bài viết', href: '/bai-viet' },
@@ -767,6 +768,15 @@ export function Header() {
                       </motion.div>
                     )}
                   </div>
+
+                  <Link
+                    href="/thue-do"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold text-luxury-gold bg-amber-50/50 hover:bg-amber-100/50"
+                  >
+                    <span>Dịch vụ Thuê đồ</span>
+                    <span className="badge-gold text-[10px]">HOT</span>
+                  </Link>
 
                   <Link
                     href="/san-pham?sort=new"

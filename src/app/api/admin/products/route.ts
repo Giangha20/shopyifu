@@ -147,6 +147,10 @@ export async function POST(request: NextRequest) {
           isNew: data.isNew ?? true,
           metaTitle: data.metaTitle || data.name,
           metaDescription: data.metaDescription,
+          isRentable: data.isRentable ?? false,
+          rentalPricePerDay: data.rentalPricePerDay ? new Prisma.Decimal(data.rentalPricePerDay) : null,
+          rentalDepositFee: data.rentalDepositFee ? new Prisma.Decimal(data.rentalDepositFee) : null,
+          rentalTerms: data.rentalTerms ?? null,
         },
       });
 

@@ -61,6 +61,16 @@ export function ProductForm({ initialData, productId }: ProductFormProps) {
   const [isNew, setIsNew] = useState(Boolean(initialData?.isNew));
   const [isBestseller, setIsBestseller] = useState(Boolean(initialData?.isBestseller));
 
+  // Rental states
+  const [isRentable, setIsRentable] = useState(Boolean(initialData?.isRentable));
+  const [rentalPricePerDay, setRentalPricePerDay] = useState(
+    initialData?.rentalPricePerDay ? String(initialData.rentalPricePerDay) : ''
+  );
+  const [rentalDepositFee, setRentalDepositFee] = useState(
+    initialData?.rentalDepositFee ? String(initialData.rentalDepositFee) : ''
+  );
+  const [rentalTerms, setRentalTerms] = useState(initialData?.rentalTerms || '');
+
   // SEO
   const [metaTitle, setMetaTitle] = useState(initialData?.metaTitle || '');
   const [metaDescription, setMetaDescription] = useState(initialData?.metaDescription || '');
@@ -222,6 +232,10 @@ export function ProductForm({ initialData, productId }: ProductFormProps) {
         isFeatured,
         isNew,
         isBestseller,
+        isRentable,
+        rentalPricePerDay: rentalPricePerDay ? Number(rentalPricePerDay) : null,
+        rentalDepositFee: rentalDepositFee ? Number(rentalDepositFee) : null,
+        rentalTerms: rentalTerms?.trim() || null,
         metaTitle: (metaTitle || name)?.trim().slice(0, 255) || null,
         metaDescription: (metaDescription || shortDescription)?.trim().slice(0, 500) || null,
         categoryIds: selectedCategoryIds,
@@ -435,6 +449,92 @@ export function ProductForm({ initialData, productId }: ProductFormProps) {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Section: Dịch vụ Thuê Đồ */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h2 className="text-base font-bold text-slate-900">
+                  Dịch Vụ Cho Thuê Đồ (Trang phục cho thuê)
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Cấu hình cho phép khách hàng đặt thuê sản phẩm này theo ngày
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isRentable}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setIsRentable(checked);
+                    if (checked && !rentalPricePerDay && price) {
+                      setRentalPricePerDay(String(Math.round(Number(price) * 0.15)));
+                    }
+                    if (checked && !rentalDepositFee && price) {
+                      setRentalDepositFee(String(Math.round(Number(price) * 0.7)));
+                    }
+                  }}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-luxury-gold"></div>
+                <span className="ml-2.5 text-xs font-bold text-slate-700">
+                  {isRentable ? 'BẬT CHO THUÊ' : 'TẮT'}
+                </span>
+              </label>
+            </div>
+
+            {isRentable && (
+              <div className="space-y-4 pt-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold uppercase text-slate-700">
+                      Giá thuê theo ngày (VNĐ) *
+                    </label>
+                    <input
+                      type="number"
+                      value={rentalPricePerDay}
+                      onChange={(e) => setRentalPricePerDay(e.target.value)}
+                      placeholder="Ví dụ: 300000"
+                      className="h-11 w-full rounded-lg border border-slate-300 px-3.5 text-sm focus:border-luxury-gold focus:outline-none"
+                    />
+                    <p className="text-[10px] text-slate-400">
+                      Gợi ý: ~15% giá bán gốc sản phẩm
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold uppercase text-slate-700">
+                      Tiền cọc đảm bảo hoàn lại (VNĐ) *
+                    </label>
+                    <input
+                      type="number"
+                      value={rentalDepositFee}
+                      onChange={(e) => setRentalDepositFee(e.target.value)}
+                      placeholder="Ví dụ: 1500000"
+                      className="h-11 w-full rounded-lg border border-slate-300 px-3.5 text-sm focus:border-luxury-gold focus:outline-none"
+                    />
+                    <p className="text-[10px] text-slate-400">
+                      Gợi ý: ~70% giá bán gốc (hoàn lại 100% khi nhận lại đồ)
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold uppercase text-slate-700">
+                    Quy định / Điều khoản riêng cho mẫu này (Tùy chọn)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={rentalTerms}
+                    onChange={(e) => setRentalTerms(e.target.value)}
+                    placeholder="Ví dụ: Đầm tơ tằm nguyên bản cần giặt hấp nhẹ, không xịt nước hoa trực tiếp..."
+                    className="w-full rounded-lg border border-slate-300 p-3 text-xs focus:border-luxury-gold focus:outline-none"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Section 3: Images Gallery */}

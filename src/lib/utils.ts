@@ -16,6 +16,8 @@ export function formatPrice(price: number | string | null | undefined): string {
   }).format(num);
 }
 
+export const formatCurrency = formatPrice;
+
 export function formatNumber(num: number): string {
   return new Intl.NumberFormat('vi-VN').format(num);
 }

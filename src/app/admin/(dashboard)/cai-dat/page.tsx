@@ -19,12 +19,17 @@ import {
   RefreshCw,
   ExternalLink,
   UserPlus,
+  Shirt,
+  Bell,
+  FileCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useStoreSettings } from '@/hooks/use-settings';
 
 export default function AdminSettingsPage() {
-  const [activeTab, setActiveTab] = useState<'general' | 'contact' | 'social' | 'shipping' | 'payment' | 'registration' | 'seo'>('general');
+  const [activeTab, setActiveTab] = useState<
+    'general' | 'contact' | 'social' | 'shipping' | 'payment' | 'registration' | 'rental' | 'announcement' | 'policies' | 'seo'
+  >('general');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingQr, setUploadingQr] = useState(false);
@@ -76,6 +81,22 @@ export default function AdminSettingsPage() {
     register_enable_google: 'true',
     register_min_password: '6',
     register_terms_text: 'Tôi đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của LUXE SHOP.',
+    // Rental Settings
+    rental_enabled: 'true',
+    rental_default_price_ratio: '15',
+    rental_default_deposit_ratio: '70',
+    rental_hotline: '1900 8888',
+    rental_policy_terms: '1. Khách hàng bảo quản trang phục cẩn thận, không tự ý cắt sửa hoặc giặt tẩy hóa chất mạnh.\n2. Tiền cọc sẽ được hoàn lại 100% khi shop nhận lại trang phục nguyên vẹn.\n3. Trường hợp rách hỏng không thể phục hồi: đền bù theo 70% giá trị gốc của sản phẩm.\n4. Thời gian trả trễ: tính thêm phí theo đơn giá thuê mỗi ngày.',
+    // Announcement Bar
+    announcement_enabled: 'true',
+    announcement_text: 'Miễn phí vận chuyển cho đơn hàng từ 500.000₫ | Đổi trả miễn phí trong 30 ngày | Dịch vụ thuê trang phục cao cấp',
+    announcement_link: '/thue-do',
+    // Policies
+    policy_return_terms: 'Hỗ trợ đổi trả miễn phí trong vòng 30 ngày đối với sản phẩm còn nguyên tem mác, chưa qua sử dụng và giặt là.',
+    policy_privacy_terms: 'LUXE SHOP cam kết bảo mật tuyệt đối 100% thông tin cá nhân và dữ liệu thanh toán của quý khách hàng.',
+    policy_shipping_terms: 'Giao hàng hỏa tốc trong 2h tại TP.HCM & Hà Nội. Giao hàng tiêu chuẩn toàn quốc từ 2-4 ngày làm việc.',
+    business_tax_id: '0109888888',
+    business_legal_rep: 'YIFU LUXURY VIETNAM',
     // SEO
     meta_title: 'LUXE SHOP - Thời Trang Cao Cấp',
     meta_description: 'Mua sắm thời trang dạ tiệc, blazer, đầm thiết kế cao cấp chính hãng.',
@@ -179,10 +200,13 @@ export default function AdminSettingsPage() {
   const tabs = [
     { id: 'general', label: 'Chung', icon: Globe },
     { id: 'payment', label: 'Thanh toán (Quốc tế & VietQR)', icon: CreditCard },
+    { id: 'rental', label: 'Dịch vụ Thuê đồ', icon: Shirt },
+    { id: 'announcement', label: 'Thanh thông báo Banner', icon: Bell },
     { id: 'registration', label: 'Cài đặt Đăng ký', icon: UserPlus },
     { id: 'shipping', label: 'Vận chuyển', icon: Truck },
-    { id: 'contact', label: 'Liên hệ', icon: Phone },
+    { id: 'contact', label: 'Liên hệ & Doanh nghiệp', icon: Phone },
     { id: 'social', label: 'Mạng xã hội', icon: Share2 },
+    { id: 'policies', label: 'Chính sách & Pháp lý', icon: FileCheck },
     { id: 'seo', label: 'SEO Mặc định', icon: Search },
   ] as const;
 
@@ -798,6 +822,185 @@ export default function AdminSettingsPage() {
                   value={settings.register_terms_text}
                   onChange={(e) => handleChange('register_terms_text', e.target.value)}
                   className="w-full rounded-lg border border-slate-300 p-2.5 text-xs focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'rental' && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">Cấu Hình Dịch Vụ Thuê Đồ</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Tùy biến toàn bộ tỷ lệ giá thuê, tiền cọc và quy định thuê trang phục</p>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">Trạng thái dịch vụ Thuê đồ</label>
+                  <select
+                    value={settings.rental_enabled}
+                    onChange={(e) => handleChange('rental_enabled', e.target.value)}
+                    className="h-10 w-full rounded-lg border border-slate-300 px-3 text-xs bg-white focus:border-luxury-gold focus:outline-none"
+                  >
+                    <option value="true">Bật dịch vụ cho thuê trang phục</option>
+                    <option value="false">Tạm đóng dịch vụ</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">Hotline tư vấn thuê đồ</label>
+                  <input
+                    type="text"
+                    value={settings.rental_hotline}
+                    onChange={(e) => handleChange('rental_hotline', e.target.value)}
+                    className="h-10 w-full rounded-lg border border-slate-300 px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">Tỷ lệ giá thuê theo ngày mặc định (% giá gốc)</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={settings.rental_default_price_ratio}
+                    onChange={(e) => handleChange('rental_default_price_ratio', e.target.value)}
+                    className="h-10 w-full rounded-lg border border-slate-300 px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                  />
+                  <p className="text-[10px] text-slate-400">Ví dụ: 15% (Sản phẩm 1.000.000₫ thì giá thuê là 150.000₫/ngày)</p>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">Tỷ lệ tiền cọc đảm bảo mặc định (% giá gốc)</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={settings.rental_default_deposit_ratio}
+                    onChange={(e) => handleChange('rental_default_deposit_ratio', e.target.value)}
+                    className="h-10 w-full rounded-lg border border-slate-300 px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                  />
+                  <p className="text-[10px] text-slate-400">Ví dụ: 70% (Hoàn lại 100% khi nhận lại trang phục nguyên vẹn)</p>
+                </div>
+              </div>
+
+              <div className="space-y-1 pt-2 border-t border-slate-100">
+                <label className="text-xs font-semibold text-slate-700">Quy định & Chính sách đền bù khi thuê trang phục</label>
+                <textarea
+                  rows={5}
+                  value={settings.rental_policy_terms}
+                  onChange={(e) => handleChange('rental_policy_terms', e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 p-3 text-xs leading-relaxed focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'announcement' && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">Thanh Thông Báo & Banner Nổi</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Thanh thông báo chạy ở đầu trang hiển thị thông điệp khuyến mãi hoặc dịch vụ mới</p>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Trạng thái thanh thông báo</label>
+                <select
+                  value={settings.announcement_enabled}
+                  onChange={(e) => handleChange('announcement_enabled', e.target.value)}
+                  className="h-10 w-full rounded-lg border border-slate-300 px-3 text-xs bg-white focus:border-luxury-gold focus:outline-none"
+                >
+                  <option value="true">Hiển thị trên toàn bộ website</option>
+                  <option value="false">Tạm ẩn thanh thông báo</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Nội dung thông báo (hỗ trợ phân cách dấu |)</label>
+                <input
+                  type="text"
+                  value={settings.announcement_text}
+                  onChange={(e) => handleChange('announcement_text', e.target.value)}
+                  className="h-10 w-full rounded-lg border border-slate-300 px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Đường dẫn khi khách bấm vào</label>
+                <input
+                  type="text"
+                  value={settings.announcement_link}
+                  onChange={(e) => handleChange('announcement_link', e.target.value)}
+                  placeholder="/thue-do hoặc /san-pham?sort=discount"
+                  className="h-10 w-full rounded-lg border border-slate-300 px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'policies' && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">Chính Sách & Pháp Lý Website</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Chỉnh sửa toàn bộ nội dung chính sách hiển thị tại chân trang footer</p>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">Mã số thuế / Giấy phép kinh doanh</label>
+                  <input
+                    type="text"
+                    value={settings.business_tax_id}
+                    onChange={(e) => handleChange('business_tax_id', e.target.value)}
+                    className="h-10 w-full rounded-lg border border-slate-300 px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">Người đại diện pháp luật / Công ty chủ quản</label>
+                  <input
+                    type="text"
+                    value={settings.business_legal_rep}
+                    onChange={(e) => handleChange('business_legal_rep', e.target.value)}
+                    className="h-10 w-full rounded-lg border border-slate-300 px-3 text-xs focus:border-luxury-gold focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1 pt-2 border-t border-slate-100">
+                <label className="text-xs font-semibold text-slate-700">Chính sách đổi trả & hoàn tiền</label>
+                <textarea
+                  rows={3}
+                  value={settings.policy_return_terms}
+                  onChange={(e) => handleChange('policy_return_terms', e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 p-3 text-xs leading-relaxed focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Chính sách bảo mật thông tin</label>
+                <textarea
+                  rows={3}
+                  value={settings.policy_privacy_terms}
+                  onChange={(e) => handleChange('policy_privacy_terms', e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 p-3 text-xs leading-relaxed focus:border-luxury-gold focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Chính sách vận chuyển & kiểm hàng</label>
+                <textarea
+                  rows={3}
+                  value={settings.policy_shipping_terms}
+                  onChange={(e) => handleChange('policy_shipping_terms', e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 p-3 text-xs leading-relaxed focus:border-luxury-gold focus:outline-none"
                 />
               </div>
             </div>

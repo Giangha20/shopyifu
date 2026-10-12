@@ -43,6 +43,7 @@ model User {
   couponRedemptions CouponRedemption[]
   notifications     Notification[]
   supportTickets    SupportTicket[]
+  rentalBookings    RentalBooking[]
   auditLogs         AuditLog[]        @relation("AuditUser")
   sessions          Session[]
   accounts          Account[]
@@ -236,6 +237,12 @@ model Product {
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
+  // Rental fields
+  isRentable          Boolean   @default(false) @map("is_rentable")
+  rentalPricePerDay   Decimal?  @map("rental_price_per_day") @db.Decimal(12, 0)
+  rentalDepositFee    Decimal?  @map("rental_deposit_fee") @db.Decimal(12, 0)
+  rentalTerms         String?   @map("rental_terms") @db.Text
+
   // Relations
   images          ProductImage[]
   categories      ProductCategory[]
@@ -246,12 +253,14 @@ model Product {
   orderItems      OrderItem[]
   wishlistItems   WishlistItem[]
   inventoryMovements InventoryMovement[]
+  rentalBookings  RentalBooking[]
 
   @@index([slug])
   @@index([sku])
   @@index([isActive, isFeatured])
   @@index([isActive, isNew])
   @@index([isActive, isBestseller])
+  @@index([isRentable])
   @@index([price])
   @@index([createdAt])
   @@index([soldCount])
@@ -801,3 +810,58 @@ model UploadedFile {
   @@index([filename])
   @@map("uploaded_files")
 }
+
+// ========================================
+// RENTAL BOOKINGS (THUÊ ĐỒ)
+// ========================================
+
+model RentalBooking {
+  id                 String    @id @default(cuid())
+  bookingNumber      String    @unique @map("booking_number")
+  userId             String?   @map("user_id")
+  productId          String    @map("product_id")
+  
+  // Customer info
+  customerName       String    @map("customer_name")
+  customerPhone      String    @map("customer_phone")
+  customerEmail      String?   @map("customer_email")
+  shippingAddress    String    @map("shipping_address") @db.Text
+  idCardNumber       String?   @map("id_card_number")
+
+  // Rental schedule
+  startDate          DateTime  @map("start_date")
+  endDate            DateTime  @map("end_date")
+  totalDays          Int       @map("total_days")
+  
+  // Financials
+  pricePerDay        Decimal   @map("price_per_day") @db.Decimal(12, 0)
+  rentalTotal        Decimal   @map("rental_total") @db.Decimal(12, 0)
+  depositFee         Decimal   @map("deposit_fee") @db.Decimal(12, 0)
+  totalAmount        Decimal   @map("total_amount") @db.Decimal(12, 0)
+  refundedDeposit    Decimal   @default(0) @map("refunded_deposit") @db.Decimal(12, 0)
+
+  // Status & payment
+  status             String    @default("PENDING") // PENDING, CONFIRMED, SHIPPING, RENTING, RETURNED, COMPLETED, CANCELLED
+  paymentMethod      String    @default("COD") @map("payment_method") // COD, BANK_TRANSFER
+  paymentStatus      String    @default("PENDING") @map("payment_status") // PENDING, DEPOSITED, PAID, REFUNDED
+
+  // Size / Note
+  sizeSelected       String?   @map("size_selected")
+  customerNotes      String?   @map("customer_notes") @db.Text
+  adminNotes         String?   @map("admin_notes") @db.Text
+  itemConditionNotes String?   @map("item_condition_notes") @db.Text
+
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  user               User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  product            Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([bookingNumber])
+  @@index([userId])
+  @@index([productId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("rental_bookings")
+}
+

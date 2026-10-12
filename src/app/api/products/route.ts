@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
     const isFeatured = searchParams.get('isFeatured');
     const isBestseller = searchParams.get('isBestseller');
     const isNew = searchParams.get('isNew');
+    const isRentable = searchParams.get('isRentable');
 
     const where: Prisma.ProductWhereInput = {
       isActive: true,
@@ -98,6 +99,7 @@ export async function GET(request: NextRequest) {
     if (isFeatured === 'true') where.isFeatured = true;
     if (isBestseller === 'true') where.isBestseller = true;
     if (isNew === 'true') where.isNew = true;
+    if (isRentable === 'true') where.isRentable = true;
 
     if (color || size) {
       where.variants = {

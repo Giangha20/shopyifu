@@ -104,6 +104,10 @@ export const productSchema = z.object({
   metaTitle: z.string().max(255).optional().nullable(),
   metaDescription: z.string().max(500).optional().nullable(),
   categoryIds: z.array(z.string()).optional(),
+  isRentable: z.boolean().optional(),
+  rentalPricePerDay: z.number().min(0).optional().nullable(),
+  rentalDepositFee: z.number().min(0).optional().nullable(),
+  rentalTerms: z.string().optional().nullable(),
 });
 
 export const productVariantSchema = z.object({
@@ -338,4 +342,34 @@ export type ShippingMethodInput = z.infer<typeof shippingMethodSchema>;
 export type StoreSettingInput = z.infer<typeof storeSettingSchema>;
 export type StaffCreateInput = z.infer<typeof staffCreateSchema>;
 export type StaffUpdateInput = z.infer<typeof staffUpdateSchema>;
+
+// ========================================
+// RENTAL BOOKING VALIDATIONS
+// ========================================
+
+export const rentalBookingSchema = z.object({
+  productId: z.string().min(1, 'Vui lòng chọn sản phẩm cần thuê'),
+  customerName: z.string().min(1, 'Vui lòng nhập họ tên').max(100),
+  customerPhone: z.string().regex(/^(0[1-9])\d{8,9}$/, 'Số điện thoại không hợp lệ'),
+  customerEmail: z.string().email('Email không hợp lệ').optional().or(z.literal('')),
+  shippingAddress: z.string().min(1, 'Vui lòng nhập địa chỉ nhận trang phục'),
+  idCardNumber: z.string().optional().or(z.literal('')),
+  startDate: z.string().min(1, 'Vui lòng chọn ngày bắt đầu thuê'),
+  endDate: z.string().min(1, 'Vui lòng chọn ngày trả đồ'),
+  paymentMethod: z.enum(['COD', 'BANK_TRANSFER']).default('COD'),
+  sizeSelected: z.string().optional(),
+  customerNotes: z.string().optional(),
+});
+
+export const rentalBookingAdminUpdateSchema = z.object({
+  status: z.enum(['PENDING', 'CONFIRMED', 'SHIPPING', 'RENTING', 'RETURNED', 'COMPLETED', 'CANCELLED']).optional(),
+  paymentStatus: z.enum(['PENDING', 'DEPOSITED', 'PAID', 'REFUNDED']).optional(),
+  refundedDeposit: z.number().min(0).optional(),
+  adminNotes: z.string().optional().nullable(),
+  itemConditionNotes: z.string().optional().nullable(),
+});
+
+export type RentalBookingInput = z.infer<typeof rentalBookingSchema>;
+export type RentalBookingAdminUpdateInput = z.infer<typeof rentalBookingAdminUpdateSchema>;
+
 

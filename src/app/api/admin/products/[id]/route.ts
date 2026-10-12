@@ -195,6 +195,10 @@ export async function PATCH(
           isBestseller: data.isBestseller,
           metaTitle: data.metaTitle,
           metaDescription: data.metaDescription,
+          isRentable: data.isRentable !== undefined ? data.isRentable : undefined,
+          rentalPricePerDay: data.rentalPricePerDay !== undefined ? toDecimal(data.rentalPricePerDay) : undefined,
+          rentalDepositFee: data.rentalDepositFee !== undefined ? toDecimal(data.rentalDepositFee) : undefined,
+          rentalTerms: data.rentalTerms !== undefined ? data.rentalTerms : undefined,
         },
         include: {
           images: true,
@@ -292,3 +296,4 @@ export async function DELETE(
     );
   }
 }
+

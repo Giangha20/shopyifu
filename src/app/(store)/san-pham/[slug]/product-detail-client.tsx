@@ -19,6 +19,8 @@ import {
   Plus,
   ArrowRight,
   Sparkles,
+  Shirt,
+  Calendar,
 } from 'lucide-react';
 import { ProductItem } from '@/types/store';
 import { formatPrice, getDiscountPercentage } from '@/lib/utils';
@@ -422,6 +424,40 @@ export default function ProductDetailClient({ initialProduct }: ProductDetailCli
                   <span>Mua ngay</span>
                   <ArrowRight className="h-4 w-4" />
                 </motion.button>
+              </div>
+
+              {/* RENTAL CTA BANNER */}
+              <div className="mt-4 p-4 rounded-2xl bg-amber-50/60 border border-luxury-gold/30 flex items-center justify-between gap-3 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-luxury-gold text-white flex items-center justify-center shrink-0">
+                    <Shirt className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-luxury-black flex items-center gap-1.5">
+                      <span>Dịch vụ Thuê Trang Phục</span>
+                      <span className="badge-gold text-[9px] px-1.5 py-0.2">Tiết kiệm 85%</span>
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      Thuê từ{' '}
+                      <strong className="text-rose-600">
+                        {formatPrice(
+                          (product as any).rentalPricePerDay
+                            ? Number((product as any).rentalPricePerDay)
+                            : Math.round(currentPrice * 0.15)
+                        )}
+                        /ngày
+                      </strong>{' '}
+                      · Hoàn cọc 100% khi trả
+                    </div>
+                  </div>
+                </div>
+                <Link
+                  href="/thue-do"
+                  className="btn-gold py-2 px-3.5 text-xs font-bold rounded-xl whitespace-nowrap shadow-sm hover:shadow flex items-center gap-1"
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Đặt thuê</span>
+                </Link>
               </div>
 
               {/* Share & Guarantees */}

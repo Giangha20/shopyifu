@@ -21,6 +21,7 @@ import {
   TrendingUp,
   X,
   ExternalLink,
+  Shirt,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -46,6 +47,7 @@ const NAV_ITEMS = [
     title: 'Quản lý bán hàng',
     items: [
       { href: '/admin/don-hang', label: 'Đơn hàng', icon: ShoppingBag },
+      { href: '/admin/thue-do', label: 'Thuê đồ', icon: Shirt },
       { href: '/admin/san-pham', label: 'Sản phẩm', icon: Package },
       { href: '/admin/danh-muc', label: 'Danh mục', icon: Layers },
       { href: '/admin/kho-hang', label: 'Kho hàng', icon: Warehouse },
