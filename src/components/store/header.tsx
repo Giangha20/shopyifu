@@ -19,12 +19,25 @@ import {
   Sparkles,
   ArrowRight,
   TrendingUp,
+  Bell,
+  CheckCircle2,
+  Volume2,
+  VolumeX,
+  Clock,
+  Gift,
+  Truck,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/hooks/use-cart';
 import { useWishlist } from '@/hooks/use-wishlist';
 import { useAuth } from '@/hooks/use-auth';
 import { useStoreSettings } from '@/hooks/use-settings';
+import {
+  playLuxuryChime,
+  sendWebNotification,
+  requestWebNotificationPermission,
+} from '@/lib/notifications';
 
 interface MegaCategory {
   title: string;
@@ -105,7 +118,29 @@ export function Header() {
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [mobileExpandedCat, setMobileExpandedCat] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [browserPermission, setBrowserPermission] = useState<NotificationPermission>('default');
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      setBrowserPermission(Notification.permission);
+    }
+  }, []);
+
+  const handleEnableWebNotification = async () => {
+    playLuxuryChime();
+    const perm = await requestWebNotificationPermission();
+    setBrowserPermission(perm);
+    if (perm === 'granted') {
+      toast.success('Đã kích hoạt thông báo trên web thành công! 🔔');
+      sendWebNotification('🔔 YIFU SHOP: Bật thông báo thành công!', {
+        body: 'Bạn sẽ nhận được thông tin đơn hàng và mã giảm giá mới nhất.',
+      });
+    } else if (perm === 'denied') {
+      toast.error('Trình duyệt đang chặn thông báo. Bấm vào biểu tượng ổ khóa 🔒 bên trái URL để Cho phép (Allow).');
+    }
+  };
 
   // Initialize store settings
   useEffect(() => {
@@ -155,11 +190,12 @@ export function Header() {
     }
   }, [isSearchOpen]);
 
-  // Close mobile menu on route change
+  // Close mobile menu & modals on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsSearchOpen(false);
     setIsMegaMenuOpen(false);
+    setIsNotifOpen(false);
   }, [pathname]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -463,6 +499,162 @@ export function Header() {
                   </span>
                 )}
               </Link>
+
+              {/* Notification Bell Dropdown (Desktop & Mobile) */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsNotifOpen(!isNotifOpen)}
+                  className="btn-icon text-slate-700 hover:text-luxury-black relative"
+                  title="Thông báo đơn hàng & khuyến mãi"
+                  aria-label="Thông báo"
+                >
+                  <Bell className="w-5 h-5" />
+                  <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+                    2
+                  </span>
+                </button>
+
+                {/* Notifications Dropdown Card */}
+                {isNotifOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setIsNotifOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 text-xs">
+                      {/* Header */}
+                      <div className="flex items-center justify-between px-4 py-3 bg-slate-900 text-white">
+                        <div className="flex items-center gap-2">
+                          <Bell className="w-4 h-4 text-luxury-gold" />
+                          <span className="font-bold text-sm">Thông Báo Web</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            playLuxuryChime();
+                            toast.info('Đã phát âm thanh thử nghiệm 🔔');
+                          }}
+                          className="text-[11px] text-slate-300 hover:text-white flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded-lg transition-colors"
+                          title="Thử âm thanh chuông"
+                        >
+                          <Volume2 className="w-3 h-3 text-luxury-gold" />
+                          <span>Thử chuông</span>
+                        </button>
+                      </div>
+
+                      {/* Permission Banner */}
+                      <div className="p-3 border-b border-slate-100 bg-amber-50/70">
+                        {browserPermission === 'granted' ? (
+                          <div className="flex items-center justify-between text-2xs text-emerald-800">
+                            <span className="flex items-center gap-1.5 font-semibold">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                              <span>Thông báo trình duyệt: ĐÃ BẬT</span>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                sendWebNotification('🔔 YIFU SHOP: Thông báo thử nghiệm', {
+                                  body: 'Bạn sẽ nhận được tin báo đơn hàng và mã giảm giá tức thì.',
+                                });
+                                toast.success('Đã gửi thông báo thử nghiệm lên màn hình!');
+                              }}
+                              className="font-bold text-emerald-700 underline hover:text-emerald-900"
+                            >
+                              Gửi thử
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-2xs text-amber-900">
+                              <p className="font-bold">Bật thông báo trên màn hình</p>
+                              <p className="text-amber-700 text-[10px]">Nhận tin đơn hàng & ưu đãi độc quyền</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={handleEnableWebNotification}
+                              className="px-3 py-1.5 bg-gradient-to-r from-luxury-gold to-amber-500 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-2xs shadow-xs transition-all shrink-0 active:scale-95 flex items-center gap-1"
+                            >
+                              <Bell className="w-3 h-3" />
+                              <span>Bật ngay</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Notifications List */}
+                      <div className="max-h-72 overflow-y-auto divide-y divide-slate-100">
+                        <div className="p-3.5 hover:bg-slate-50 transition-colors flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
+                            <Gift className="w-4 h-4 text-amber-600" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-bold text-slate-900 text-xs">Mã giảm giá 10% WELCOME10</p>
+                            <p className="text-slate-600 text-2xs mt-0.5 leading-relaxed">
+                              Nhập mã <strong>WELCOME10</strong> tại bước thanh toán để nhận ngay giảm giá 10% cho đơn hàng đầu tiên!
+                            </p>
+                            <p className="text-[10px] text-slate-400 mt-1">Đang áp dụng</p>
+                          </div>
+                        </div>
+
+                        <div className="p-3.5 hover:bg-slate-50 transition-colors flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center shrink-0 mt-0.5">
+                            <Truck className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-bold text-slate-900 text-xs">Miễn phí giao hàng toàn quốc</p>
+                            <p className="text-slate-600 text-2xs mt-0.5 leading-relaxed">
+                              Miễn phí vận chuyển tiêu chuẩn cho mọi đơn hàng giá trị từ 500.000₫.
+                            </p>
+                            <p className="text-[10px] text-slate-400 mt-1">Chính sách vận chuyển</p>
+                          </div>
+                        </div>
+
+                        <div className="p-3.5 hover:bg-slate-50 transition-colors flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center shrink-0 mt-0.5">
+                            <Sparkles className="w-4 h-4 text-purple-600" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-bold text-slate-900 text-xs">Dịch vụ Thuê đồ & BST Mới</p>
+                            <p className="text-slate-600 text-2xs mt-0.5 leading-relaxed">
+                              Khám phá hơn 30 mẫu đầm dạ hội, vest và phụ kiện sẵn sàng cho thuê với thủ tục tiện lợi.
+                            </p>
+                            <p className="text-[10px] text-slate-400 mt-1">Vừa cập nhật</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Footer */}
+                      <div className="p-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-2xs">
+                        {user ? (
+                          <Link
+                            href="/tai-khoan/thong-bao"
+                            onClick={() => setIsNotifOpen(false)}
+                            className="font-bold text-luxury-gold hover:text-slate-900 transition-colors"
+                          >
+                            Tất cả thông báo tài khoản &rarr;
+                          </Link>
+                        ) : (
+                          <Link
+                            href="/dang-nhap"
+                            onClick={() => setIsNotifOpen(false)}
+                            className="font-bold text-luxury-gold hover:text-slate-900 transition-colors"
+                          >
+                            Đăng nhập nhận ưu đãi &rarr;
+                          </Link>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setIsNotifOpen(false)}
+                          className="text-slate-400 hover:text-slate-700"
+                        >
+                          Đóng
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
 
               {/* Account icon & Dropdown */}
               <div className="relative group">
@@ -856,6 +1048,32 @@ export function Header() {
                     <Mail className="w-4 h-4 text-luxury-gold" />
                     <span>{settings.contactEmail || 'support@luxe-shop.vn'}</span>
                   </a>
+                </div>
+
+                {/* Mobile Web Notification toggle */}
+                <div className="py-2.5 px-3 bg-amber-50/70 rounded-xl my-2 border border-amber-200/60 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Bell className="w-4 h-4 text-amber-600 animate-bounce" />
+                    <div>
+                      <p className="text-xs font-bold text-amber-950">Thông báo Web</p>
+                      <p className="text-[10px] text-amber-700">
+                        {browserPermission === 'granted' ? 'Đã bật thông báo' : 'Nhận ưu đãi & đơn hàng'}
+                      </p>
+                    </div>
+                  </div>
+                  {browserPermission === 'granted' ? (
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                      Đã bật ✓
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleEnableWebNotification}
+                      className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 text-2xs font-bold rounded-lg shadow-xs active:scale-95 transition-all"
+                    >
+                      Bật ngay
+                    </button>
+                  )}
                 </div>
               </div>
 

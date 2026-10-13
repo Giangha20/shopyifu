@@ -16,11 +16,19 @@ import {
   ExternalLink,
   Clock,
   CheckCircle,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
   Volume2,
   VolumeX,
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import {
+  playLuxuryChime,
+  sendWebNotification,
+  requestWebNotificationPermission,
+} from '@/lib/notifications';
 
 interface OrderNotification {
   id: string;
@@ -54,43 +62,25 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   const [pendingCount, setPendingCount] = useState<number>(0);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [browserPermission, setBrowserPermission] = useState<NotificationPermission>('default');
   const previousOrderCountRef = useRef<number>(0);
   const previousLatestOrderIdRef = useRef<string>('');
 
-  // Load sound setting from localStorage
+  // Load sound setting and notification permission
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('admin_order_sound_enabled');
       if (saved !== null) {
         setSoundEnabled(saved === 'true');
       }
+      if ('Notification' in window) {
+        setBrowserPermission(Notification.permission);
+      }
     }
   }, []);
 
-  // Web Audio chime generator (Luxury multi-tone bell)
   const playOrderChime = () => {
-    try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const now = ctx.currentTime;
-      const chords = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
-
-      chords.forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now + idx * 0.12);
-        gain.gain.setValueAtTime(0.25, now + idx * 0.12);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.9);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + idx * 0.12);
-        osc.stop(now + idx * 0.12 + 0.9);
-      });
-    } catch (e) {
-      console.warn('Audio chime playback failed:', e);
-    }
+    playLuxuryChime();
   };
 
   const toggleSound = () => {
@@ -108,13 +98,28 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   };
 
   const requestNotificationPermission = async () => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      if (Notification.permission === 'default') {
-        const perm = await Notification.requestPermission();
-        if (perm === 'granted') {
-          toast.success('Đã kích hoạt thông báo trên màn hình máy tính!');
-        }
-      }
+    playOrderChime(); // User gesture unlocks audio context
+    const perm = await requestWebNotificationPermission();
+    setBrowserPermission(perm);
+    if (perm === 'granted') {
+      toast.success('Đã kích hoạt thông báo trên màn hình máy tính! 🔔');
+      sendWebNotification('🔔 YIFU SHOP Quản Trị: Đã bật thông báo!', {
+        body: 'Hệ thống sẽ phát chuông và gửi thông báo tức thì khi có khách đặt hàng mới.',
+      });
+    } else if (perm === 'denied') {
+      toast.error('Trình duyệt đang chặn thông báo. Bạn hãy bấm vào biểu tượng ổ khóa 🔒 bên trái URL để Cho phép (Allow).');
+    }
+  };
+
+  const handleTestAlert = () => {
+    playOrderChime();
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+      sendWebNotification('🔔 Thử nghiệm thông báo đơn hàng YIFU SHOP', {
+        body: 'Chuông báo và thông báo màn hình đang hoạt động hoàn hảo 100%!',
+      });
+      toast.success('Đã phát chuông và gửi thông báo thử nghiệm! 🔔');
+    } else {
+      toast.info('Đã phát chuông báo thử nghiệm! Bấm "Bật thông báo" để nhận tin nổi trên màn hình.');
     }
   };
 
@@ -245,7 +250,20 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       </div>
 
       {/* Right controls */}
-      <div className="flex items-center gap-3 sm:gap-4">
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Quick Enable Notification Button if not yet granted */}
+        {browserPermission !== 'granted' && (
+          <button
+            type="button"
+            onClick={requestNotificationPermission}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95"
+            title="Bấm để kích hoạt thông báo nổi trên màn hình máy tính khi có khách đặt hàng"
+          >
+            <Bell className="h-3.5 w-3.5 animate-bounce" />
+            <span>Bật thông báo Web</span>
+          </button>
+        )}
+
         {/* Notifications Bell Dropdown */}
         <div className="relative">
           <button
@@ -302,13 +320,51 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                     </button>
                     <button
                       type="button"
-                      onClick={playOrderChime}
+                      onClick={handleTestAlert}
                       className="px-1.5 py-1 text-[11px] font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded"
-                      title="Bấm để thử nghe chuông báo đơn mới"
+                      title="Bấm để thử nghe chuông báo và gửi thông báo kiểm tra"
                     >
                       Thử chuông
                     </button>
                   </div>
+                </div>
+
+                {/* Browser Notification Status Banner */}
+                <div className="px-3.5 py-2 border-b border-slate-100 text-xs">
+                  {browserPermission === 'granted' ? (
+                    <div className="flex items-center justify-between bg-emerald-50 text-emerald-800 rounded-xl px-2.5 py-1.5 border border-emerald-200/60 text-2xs">
+                      <span className="flex items-center gap-1.5 font-medium">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                        <span>Thông báo máy tính: <strong>ĐÃ BẬT</strong></span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleTestAlert}
+                        className="underline hover:text-emerald-950 font-semibold"
+                      >
+                        Thử tin báo
+                      </button>
+                    </div>
+                  ) : browserPermission === 'denied' ? (
+                    <div className="flex items-center gap-1.5 bg-rose-50 text-rose-800 rounded-xl px-2.5 py-1.5 border border-rose-200/60 text-2xs">
+                      <AlertCircle className="h-3.5 w-3.5 text-rose-600 shrink-0" />
+                      <span>Trình duyệt đang chặn tin báo. Bấm 🔒 ở thanh web để Cho phép.</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between bg-amber-50 text-amber-900 rounded-xl px-2.5 py-1.5 border border-amber-200/60 text-2xs">
+                      <span className="flex items-center gap-1.5">
+                        <Bell className="h-3.5 w-3.5 text-amber-600 shrink-0 animate-bounce" />
+                        <span>Chưa bật thông báo màn hình</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={requestNotificationPermission}
+                        className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-2 py-0.5 rounded-lg shadow-xs"
+                      >
+                        Bật ngay
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
@@ -358,7 +414,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                     className="text-2xs text-slate-500 hover:text-luxury-gold flex items-center gap-1"
                     title="Bấm để nhận thông báo nổi trên góc màn hình máy tính"
                   >
-                    <span>🔔 Bật thông báo máy tính</span>
+                    <span>🔔 {browserPermission === 'granted' ? 'Cài đặt thông báo' : 'Bật thông báo máy tính'}</span>
                   </button>
                   <Link
                     href="/admin/don-hang"

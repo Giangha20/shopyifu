@@ -34,6 +34,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { useStoreSettings } from '@/hooks/use-settings';
 import { toast } from 'sonner';
+import {
+  playLuxuryChime,
+  sendWebNotification,
+  requestWebNotificationPermission,
+} from '@/lib/notifications';
 
 export default function AdminSettingsPage() {
   const [activeTab, setActiveTab] = useState<
@@ -766,6 +771,57 @@ export default function AdminSettingsPage() {
                   <option value="30">Mỗi 30 giây</option>
                   <option value="60">Mỗi 1 phút</option>
                 </select>
+              </div>
+            </div>
+
+            {/* Quick Test & Activation Card */}
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-5 rounded-2xl border border-amber-200/80 space-y-3">
+              <div className="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wider">
+                <Sparkles className="w-4 h-4 text-luxury-gold" />
+                <span>Kích Hoạt & Kiểm Tra Thông Báo Trực Tiếp Trên Trình Duyệt</span>
+              </div>
+              <p className="text-xs text-amber-800 leading-relaxed">
+                Bấm nút bên dưới để trình duyệt cấp quyền thông báo và kiểm tra âm thanh chuông reo thực tế trên máy tính hoặc điện thoại của bạn:
+              </p>
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    playLuxuryChime();
+                    const perm = await requestWebNotificationPermission();
+                    if (perm === 'granted') {
+                      toast.success('Đã cấp quyền thông báo trên trình duyệt thành công! 🔔');
+                      sendWebNotification('🔔 YIFU SHOP: Kích hoạt thông báo thành công!', {
+                        body: 'Hệ thống đã sẵn sàng phát chuông và gửi thông báo khi có đơn hàng mới.',
+                      });
+                    } else if (perm === 'denied') {
+                      toast.error('Trình duyệt đang chặn thông báo. Bạn hãy bấm vào biểu tượng 🔒 ở góc trái thanh địa chỉ web để Cho phép.');
+                    }
+                  }}
+                  className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2 shadow-xs transition-all active:scale-95"
+                >
+                  <Bell className="w-4 h-4" />
+                  <span>Kích hoạt quyền thông báo máy tính</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    playLuxuryChime();
+                    sendWebNotification('🔔 Thông báo thử nghiệm YIFU SHOP', {
+                      body: 'Chuông reo và thông báo đẩy đang hoạt động 100%!',
+                    });
+                    toast.success('Đã phát âm thanh chuông và gửi thông báo thử nghiệm! 🔔');
+                  }}
+                  className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-xs transition-all active:scale-95"
+                >
+                  <Volume2 className="w-4 h-4 text-luxury-gold" />
+                  <span>Phát thử chuông & Gửi thông báo mẫu</span>
+                </button>
+              </div>
+
+              <div className="pt-3 border-t border-amber-200/60 text-2xs text-amber-900/80 leading-relaxed">
+                💡 <strong>Lưu ý:</strong> Để nhận được thông báo ngay cả khi đang làm việc ở tab khác, hãy bấm <strong>Cho phép (Allow)</strong> khi trình duyệt hiện bảng hỏi. Nếu vô tình bấm Chặn, bấm vào biểu tượng <strong>ổ khóa 🔒</strong> ở thanh địa chỉ web $\rightarrow$ mục <strong>Thông báo (Notifications)</strong> $\rightarrow$ chọn <strong>Cho phép (Allow)</strong> $\rightarrow$ tải lại trang.
               </div>
             </div>
           </div>
