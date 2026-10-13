@@ -30,11 +30,11 @@ interface HeroSlide {
 const HERO_SLIDES: HeroSlide[] = [
   {
     id: 1,
-    badge: 'BỘ SƯU TẬP THU ĐÔNG 2026',
+    badge: 'BỘ SƯU TẬP HAUTE COUTURE 2026',
     title: 'Nghệ Thuật Của Sự',
     titleAccent: 'Tinh Tế & Quý Tộc',
     description:
-      'Chắt lọc từ những chất liệu thượng hạng thế giới kết hợp kỹ nghệ may đo thủ công bậc thầy. Tôn vinh đẳng cấp riêng biệt của bạn.',
+      'Chắt lọc từ lụa tơ tằm thượng hạng và vải len Merino Ý. Kỹ nghệ may đo thủ công bậc thầy tôn vinh khí chất kiêu kỳ và vị thế thượng lưu.',
     primaryCtaText: 'Khám phá bộ sưu tập',
     primaryCtaLink: '/san-pham',
     secondaryCtaText: 'Xem Lookbook 2026',
@@ -44,31 +44,45 @@ const HERO_SLIDES: HeroSlide[] = [
   },
   {
     id: 2,
-    badge: 'HAUTE COUTURE EXCLUSIVE',
-    title: 'Tuyệt Tác May Đo',
-    titleAccent: 'Vượt Thời Gian',
+    badge: 'DỊCH VỤ THUÊ ĐỒ DẠ HỘI 5 SAO',
+    title: 'Khoác Lên Đẳng Cấp',
+    titleAccent: 'Thảm Đỏ Thượng Lưu',
     description:
-      'Bộ sưu tập veston Ý và đầm lụa tơ tằm thượng phẩm dành riêng cho những dịp trọng đại và phong cách đỉnh cao.',
-    primaryCtaText: 'Mua sắm ngay',
+      'Hơn 100+ mẫu đầm dạ hội Haute Couture, vest Tuxedo và trang sức xa xỉ cho thuê với chi phí tối ưu, kèm dịch vụ chỉnh sửa vừa vặn tận nơi.',
+    primaryCtaText: 'Khám phá tủ đồ thuê',
+    primaryCtaLink: '/thue-do',
+    secondaryCtaText: 'Tư vấn thử đồ VIP',
+    secondaryCtaLink: '/lien-he',
+    imageUrl:
+      'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=2000&auto=format&fit=crop',
+  },
+  {
+    id: 3,
+    badge: 'EXCLUSIVE ATELIER & SUIT',
+    title: 'Tuyệt Tác May Đo',
+    titleAccent: 'Chuẩn Mực Quý Ông & Quý Cô',
+    description:
+      'Form dáng chuẩn mực Châu Âu, phom áo tôn dáng hoàn hảo cho các dạ tiệc ngoại giao, hội nghị thượng đỉnh và khoảnh khắc trọng đại.',
+    primaryCtaText: 'Mua sắm thiết kế',
     primaryCtaLink: '/san-pham',
-    secondaryCtaText: 'Đặt may riêng',
+    secondaryCtaText: 'Đặt may đo riêng',
     secondaryCtaLink: '/lien-he',
     imageUrl:
       'https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2000&auto=format&fit=crop',
   },
   {
-    id: 3,
-    badge: 'LUXURY ACCESSORIES',
-    title: 'Phụ Kiện Da &',
+    id: 4,
+    badge: 'DIAMOND & LEATHER COLLECTION',
+    title: 'Túi Da Ý Thủ Công &',
     titleAccent: 'Trang Sức Độc Bản',
     description:
-      'Túi da cá sấu chế tác thủ công và đồng hồ cơ tinh xảo - điểm xuyết hoàn hảo cho diện mạo sang trọng cuốn hút.',
-    primaryCtaText: 'Xem phụ kiện',
+      'Chế tác thủ công da Epsom nguyên tấm và ngọc trai South Sea tinh tuyển. Điểm nhấn hoàn mỹ khẳng định vị thế quý phái.',
+    primaryCtaText: 'Xem bộ sưu tập phụ kiện',
     primaryCtaLink: '/danh-muc/tui-xach-da',
     secondaryCtaText: 'Nhận tư vấn VIP',
     secondaryCtaLink: '/lien-he',
     imageUrl:
-      'https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2000&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=2000&auto=format&fit=crop',
   },
 ];
 

@@ -28,7 +28,8 @@
 
   body {
     @apply bg-white text-slate-900 font-sans;
-    font-feature-settings: 'liga' 1, 'calt' 1;
+    font-feature-settings: 'liga' 1, 'calt' 1, 'kern' 1;
+    letter-spacing: -0.011em;
   }
 
   /* Safe area for mobile */
@@ -46,26 +47,28 @@
 
   /* Selection color */
   ::selection {
-    @apply bg-luxury-gold/20 text-luxury-black;
+    @apply bg-luxury-gold/30 text-luxury-black;
   }
 
-  /* Scrollbar */
+  /* Custom Luxury Scrollbar */
   ::-webkit-scrollbar {
-    @apply w-2;
+    width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-gray-100;
+    background: #F8FAFC;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full;
+    background: #CBD5E1;
+    border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-400;
+    background: #94A3B8;
   }
 
   /* Headings */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif tracking-tight;
+    @apply font-serif tracking-tight text-slate-900;
   }
 }
 
@@ -84,13 +87,14 @@
   }
 
   /* Card */
+  /* Card */
   .card-luxe {
-    @apply bg-white rounded-xl border border-gray-100 shadow-luxury transition-shadow duration-300 hover:shadow-luxury-lg;
+    @apply bg-white rounded-2xl border border-gray-100/80 shadow-luxury transition-all duration-500 hover:shadow-luxury-lg hover:-translate-y-1;
   }
 
   /* Button styles */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-luxury-black text-white px-6 py-3 font-medium text-sm
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-luxury-black text-white px-6 py-3 font-semibold text-sm
            transition-all duration-300 ease-luxury
            hover:bg-luxury-black/90 hover:shadow-luxury-lg
            active:scale-[0.98]
@@ -99,23 +103,24 @@
   }
 
   .btn-gold {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-luxury-gold text-white px-6 py-3 font-medium text-sm
+    @apply inline-flex items-center justify-center gap-2 rounded-xl text-slate-950 font-bold px-6 py-3 text-sm tracking-wide
+           bg-gradient-to-r from-[#F0D59E] via-[#C9A96E] to-[#AF8A46]
            transition-all duration-300 ease-luxury
-           hover:bg-luxury-gold-dark hover:shadow-glow
+           hover:brightness-105 hover:shadow-[0_10px_30px_rgba(201,169,110,0.4)]
            active:scale-[0.98]
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border-2 border-luxury-black text-luxury-black px-6 py-3 font-medium text-sm
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 text-slate-900 px-6 py-3 font-semibold text-sm
            transition-all duration-300 ease-luxury
-           hover:bg-luxury-black hover:text-white
+           hover:bg-slate-900 hover:text-white hover:border-slate-900
            active:scale-[0.98]
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg text-slate-600 px-4 py-2 font-medium text-sm
+    @apply inline-flex items-center justify-center gap-2 rounded-xl text-slate-600 px-4 py-2 font-medium text-sm
            transition-all duration-200
            hover:bg-slate-100 hover:text-slate-900
            active:scale-[0.98]
@@ -132,7 +137,7 @@
 
   /* Input styles */
   .input-luxe {
-    @apply w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm
+    @apply w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm
            placeholder:text-gray-400
            transition-all duration-200
            focus:border-luxury-gold focus:ring-2 focus:ring-luxury-gold/20 focus:outline-none
@@ -143,17 +148,25 @@
     @apply border-rose-500 focus:border-rose-500 focus:ring-rose-500/20;
   }
 
-  /* Badge */
+  /* Badges */
   .badge-new {
-    @apply inline-flex items-center rounded-full bg-emerald-500 text-white text-2xs font-semibold px-2.5 py-0.5 uppercase tracking-wider;
+    @apply inline-flex items-center rounded-full bg-emerald-600 text-white text-[10px] font-bold px-2.5 py-0.5 uppercase tracking-wider shadow-sm;
   }
 
   .badge-sale {
-    @apply inline-flex items-center rounded-full bg-rose-500 text-white text-2xs font-semibold px-2.5 py-0.5 uppercase tracking-wider;
+    @apply inline-flex items-center rounded-full bg-rose-600 text-white text-[10px] font-bold px-2.5 py-0.5 uppercase tracking-wider shadow-sm;
   }
 
   .badge-bestseller {
-    @apply inline-flex items-center rounded-full bg-luxury-gold text-white text-2xs font-semibold px-2.5 py-0.5 uppercase tracking-wider;
+    @apply inline-flex items-center rounded-full bg-amber-500 text-slate-950 text-[10px] font-bold px-2.5 py-0.5 uppercase tracking-wider shadow-sm;
+  }
+
+  .badge-gold {
+    @apply inline-flex items-center rounded-full bg-gradient-to-r from-luxury-gold to-amber-500 text-slate-950 text-[10px] font-bold px-2.5 py-0.5 uppercase tracking-wider shadow-sm;
+  }
+
+  .text-gold-gradient {
+    @apply bg-gradient-to-r from-[#F0D59E] via-[#C9A96E] to-[#AF8A46] bg-clip-text text-transparent;
   }
 
   /* Product card */

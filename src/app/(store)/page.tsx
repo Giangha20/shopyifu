@@ -14,7 +14,16 @@ import {
   Award,
   ChevronRight,
   TrendingUp,
+  Copy,
+  Check,
+  Crown,
+  Shirt,
+  Scissors,
+  ShieldCheck,
+  Instagram,
+  ExternalLink,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { HeroBanner } from '@/components/store/hero-banner';
 import { CategoryGrid } from '@/components/store/category-grid';
@@ -222,9 +231,103 @@ const TESTIMONIALS = [
   },
 ];
 
+// Curated Rental Showcase Items for Homepage
+const RENTAL_HIGHLIGHTS = [
+  {
+    id: 'rent-1',
+    name: 'Đầm Dạ Hội Lụa Đỏ Rượu Thắt Eo Hoàng Gia',
+    category: 'Đầm Dạ Hội VIP',
+    rentalPrice: 450000,
+    retailPrice: 12500000,
+    image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80',
+    link: '/thue-do',
+    badge: 'BEST RENTAL',
+  },
+  {
+    id: 'rent-2',
+    name: 'Tuxedo Đen Nhung Ý Cổ Sam Lịch Lãm',
+    category: 'Veston & Suit Quý Ông',
+    rentalPrice: 350000,
+    retailPrice: 8900000,
+    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&q=80',
+    link: '/thue-do',
+    badge: 'THẢM ĐỎ CANNES',
+  },
+  {
+    id: 'rent-3',
+    name: 'Đầm Sequin Đính Đá Vàng Champagne Lấp Lánh',
+    category: 'Đầm Dạ Tiệc Thượng Lưu',
+    rentalPrice: 550000,
+    retailPrice: 16000000,
+    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80',
+    link: '/thue-do',
+    badge: 'LUXURY VIP',
+  },
+  {
+    id: 'rent-4',
+    name: 'Set Váy Lụa Tơ Tằm Cung Đình Thêu Tay',
+    category: 'Váy Cưới & Tiệc Sang',
+    rentalPrice: 300000,
+    retailPrice: 7200000,
+    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800&q=80',
+    link: '/thue-do',
+    badge: 'THỦ CÔNG',
+  },
+];
+
+// Curated Instagram / Lookbook Moodboard
+const LOOKBOOK_ITEMS = [
+  {
+    id: 1,
+    image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80',
+    tag: '#YIFUStyle',
+    title: 'Paris Fashion Week 2026',
+  },
+  {
+    id: 2,
+    image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80',
+    tag: '#HauteCouture',
+    title: 'Dạ tiệc Opera Gala',
+  },
+  {
+    id: 3,
+    image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&q=80',
+    tag: '#BespokeTailoring',
+    title: 'Kỹ nghệ may đo thủ công',
+  },
+  {
+    id: 4,
+    image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=80',
+    tag: '#LeatherCraft',
+    title: 'Túi da Epsom độc bản',
+  },
+  {
+    id: 5,
+    image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80',
+    tag: '#HighJewelry',
+    title: 'Kim cương & Ngọc trai',
+  },
+  {
+    id: 6,
+    image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&q=80',
+    tag: '#VIPConcierge',
+    title: 'Private Boutique Experience',
+  },
+];
+
 export default function HomePage() {
   const [newArrivals, setNewArrivals] = useState<any[]>(NEW_ARRIVALS);
   const [bestSellers, setBestSellers] = useState<any[]>(BEST_SELLERS);
+  const [hasCopiedVoucher, setHasCopiedVoucher] = useState(false);
+
+  const handleCopyVoucher = () => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText('LUXE40');
+      setHasCopiedVoucher(true);
+      toast.success('Đã sao chép mã giảm giá LUXE40! 🎁');
+      setTimeout(() => setHasCopiedVoucher(false), 3000);
+    }
+  };
 
   // Fetch real database products so admin edits immediately show on homepage
   useEffect(() => {
@@ -339,7 +442,160 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. PROMOTIONAL BANNER WITH LIVE COUNTDOWN TIMER */}
+      {/* 5. HIGH-FASHION VIP RENTAL SHOWCASE (DỊCH VỤ THUÊ ĐỒ DẠ HỘI THƯỢNG LƯU) */}
+      <section className="py-20 sm:py-28 bg-[#101012] text-white relative overflow-hidden border-y border-luxury-gold/20">
+        {/* Ambient background glows */}
+        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-luxury-gold/10 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-0 left-10 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="container-luxe mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/40 text-luxury-gold text-xs font-bold tracking-[0.25em] uppercase mb-3">
+                <Crown className="w-3.5 h-3.5" />
+                <span>DỊCH VỤ THUÊ ĐỒ DẠ HỘI 5 SAO</span>
+              </div>
+              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+                Khoác Lên Mình Đẳng Cấp <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-luxury-gold via-amber-200 to-luxury-gold">
+                  Thảm Đỏ Thượng Lưu
+                </span>
+              </h2>
+              <p className="text-sm sm:text-base text-slate-300 mt-3 font-light leading-relaxed">
+                Đặc quyền diện các thiết kế Haute Couture, váy dạ hội lụa tơ tằm và Tuxedo quý tộc từ các nhà mốt danh tiếng với mức giá thuê chỉ từ <strong>250.000₫/ngày</strong>. Tỏa sáng tuyệt đối tại các dạ tiệc, sự kiện & thảm đỏ danh giá.
+              </p>
+            </div>
+
+            <Link
+              href="/thue-do"
+              className="btn-gold px-7 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider inline-flex items-center gap-2 shadow-glow shrink-0 active:scale-95"
+            >
+              <span>Xem tất cả 100+ mẫu đồ thuê</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* 4 Featured Rental Outfits Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            {RENTAL_HIGHLIGHTS.map((item) => (
+              <div
+                key={item.id}
+                className="group relative flex flex-col rounded-3xl overflow-hidden bg-white/5 border border-white/10 hover:border-luxury-gold/60 transition-all duration-500 hover:shadow-[0_20px_45px_rgba(201,169,110,0.2)] hover:-translate-y-1.5"
+              >
+                {/* Image */}
+                <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-900">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+
+                  {/* Badge */}
+                  <div className="absolute top-3 left-3 z-10">
+                    <span className="badge-gold text-[10px] px-2.5 py-0.5 font-bold shadow-md">
+                      {item.badge}
+                    </span>
+                  </div>
+
+                  {/* Rental Tag Callout */}
+                  <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-black/60 backdrop-blur-md border border-white/15">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] uppercase tracking-wider text-slate-300 block">
+                          Giá thuê từ:
+                        </span>
+                        <span className="font-serif text-base font-bold text-luxury-gold">
+                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.rentalPrice)}
+                          <span className="text-2xs font-normal text-slate-300">/ngày</span>
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[9px] text-slate-400 block line-through">
+                          Gốc: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.retailPrice)}
+                        </span>
+                        <span className="text-[10px] font-bold text-emerald-400">
+                          Tiết kiệm 95%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Details */}
+                <div className="p-5 flex flex-col flex-1">
+                  <span className="text-2xs uppercase tracking-wider text-luxury-gold font-semibold mb-1">
+                    {item.category}
+                  </span>
+                  <h3 className="font-serif text-base font-bold text-white group-hover:text-luxury-gold transition-colors line-clamp-1 mb-4">
+                    {item.name}
+                  </h3>
+
+                  <div className="mt-auto">
+                    <Link
+                      href={item.link}
+                      className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-luxury-gold hover:text-slate-950 text-white text-xs font-bold transition-all border border-white/20 active:scale-95"
+                    >
+                      <span>Xem lịch thuê & Đặt đồ</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 3 VIP Rental Privileges */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 pt-12 border-t border-white/10">
+            <div className="flex items-start gap-4 p-5 rounded-2xl bg-white/5 border border-white/10">
+              <div className="w-11 h-11 rounded-xl bg-luxury-gold/20 border border-luxury-gold/40 flex items-center justify-center shrink-0">
+                <Scissors className="w-5 h-5 text-luxury-gold" />
+              </div>
+              <div>
+                <h4 className="font-serif text-base font-bold text-white mb-1">
+                  Thử Đồ & Chỉnh Sửa Chuẩn Phom
+                </h4>
+                <p className="text-xs text-slate-300 leading-relaxed font-light">
+                  Được thử trực tiếp tại showroom hoặc gửi thử tận nhà. Thợ may hỗ trợ chỉnh eo và chiều dài vừa vặn hoàn hảo.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 p-5 rounded-2xl bg-white/5 border border-white/10">
+              <div className="w-11 h-11 rounded-xl bg-luxury-gold/20 border border-luxury-gold/40 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5 text-luxury-gold" />
+              </div>
+              <div>
+                <h4 className="font-serif text-base font-bold text-white mb-1">
+                  Giặt Hấp Tiệt Trùng Sinh Học 5 Sao
+                </h4>
+                <p className="text-xs text-slate-300 leading-relaxed font-light">
+                  Mỗi trang phục được giặt khô bằng dung môi hữu cơ cao cấp, khử khuẩn bằng tia UV và là ủi phẳng phiu thơm mát.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 p-5 rounded-2xl bg-white/5 border border-white/10">
+              <div className="w-11 h-11 rounded-xl bg-luxury-gold/20 border border-luxury-gold/40 flex items-center justify-center shrink-0">
+                <Sparkles className="w-5 h-5 text-luxury-gold" />
+              </div>
+              <div>
+                <h4 className="font-serif text-base font-bold text-white mb-1">
+                  Giao Hỏa Tốc & Miễn Phí Phụ Kiện
+                </h4>
+                <p className="text-xs text-slate-300 leading-relaxed font-light">
+                  Tặng kèm túi xách cầm tay và phụ kiện phối đồ phù hợp. Giao nhận 2 chiều tận nơi không cần di chuyển.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. PROMOTIONAL BANNER WITH LIVE COUNTDOWN TIMER */}
       <section className="py-16 sm:py-20 bg-luxury-black text-white relative overflow-hidden">
         {/* Decorative background image */}
         <div className="absolute inset-0 opacity-25">
@@ -433,17 +689,37 @@ export default function HomePage() {
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6 p-4 rounded-xl bg-black/60 backdrop-blur-md border border-white/20">
-                  <div className="flex items-center justify-between">
+                <div className="absolute bottom-6 left-6 right-6 p-4 rounded-xl bg-black/75 backdrop-blur-md border border-luxury-gold/30 shadow-2xl">
+                  <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="text-xs uppercase tracking-wider text-luxury-gold font-bold">
-                        VOUCHER: LUXE40
-                      </p>
-                      <p className="text-sm font-serif font-bold text-white">
-                        Giảm trực tiếp 40% giỏ hàng
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs uppercase tracking-wider text-luxury-gold font-bold">
+                          VOUCHER: LUXE40
+                        </span>
+                        <span className="badge-sale text-[10px] px-2 py-0.5">GIẢM 40%</span>
+                      </div>
+                      <p className="text-sm font-serif font-bold text-white mt-0.5">
+                        Áp dụng toàn bộ đơn hàng
                       </p>
                     </div>
-                    <span className="badge-sale text-xs px-2.5 py-1">SALE VIP</span>
+                    <button
+                      type="button"
+                      onClick={handleCopyVoucher}
+                      className="px-3.5 py-2 rounded-lg bg-luxury-gold text-luxury-black hover:bg-luxury-gold-light active:scale-95 transition-all text-xs font-bold inline-flex items-center gap-1.5 shrink-0 shadow-gold"
+                      title="Sao chép mã giảm giá"
+                    >
+                      {hasCopiedVoucher ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-black" />
+                          <span>Đã lưu!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Sao chép</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -656,7 +932,67 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 9. NEWSLETTER SUBSCRIPTION SECTION */}
+      {/* 9. INSTAGRAM & LOOKBOOK MOODBOARD (#YIFUStyle) */}
+      <section className="py-20 sm:py-24 bg-luxury-black text-white relative overflow-hidden border-t border-luxury-gold/20">
+        <div className="container-luxe mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <div className="inline-flex items-center gap-2 text-luxury-gold mb-2">
+              <Instagram className="w-4 h-4" />
+              <span className="text-xs uppercase font-semibold tracking-[0.25em]">
+                #YIFUSTYLE &bull; RUNWAY TO REALITY
+              </span>
+            </div>
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
+              Sắc Thái Thời Trang Thượng Lưu
+            </h2>
+            <p className="text-sm sm:text-base text-slate-300 mt-3">
+              Khám phá cách giới tinh hoa và các đại sứ thương hiệu biến tấu trang phục YIFU trong cuộc sống và các dạ tiệc xa hoa.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+            {LOOKBOOK_ITEMS.map((item) => (
+              <div
+                key={item.id}
+                className="group relative aspect-[3/4] rounded-xl overflow-hidden border border-white/10 hover:border-luxury-gold/60 transition-all duration-500 shadow-lg"
+              >
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                  className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3.5">
+                  <span className="text-[11px] font-bold text-luxury-gold uppercase tracking-wider">
+                    {item.tag}
+                  </span>
+                  <p className="text-xs font-serif font-medium text-white line-clamp-1 mt-0.5">
+                    {item.title}
+                  </p>
+                </div>
+                <div className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center text-white/80 group-hover:text-luxury-gold transition-colors">
+                  <Instagram className="w-3.5 h-3.5" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link
+              href="https://instagram.com"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full border border-luxury-gold/40 hover:border-luxury-gold bg-luxury-gold/10 hover:bg-luxury-gold/20 text-luxury-gold text-xs font-semibold uppercase tracking-wider transition-all duration-300 shadow-gold"
+            >
+              <Instagram className="w-4 h-4" />
+              <span>Theo dõi @yifu.couture trên Instagram</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 10. NEWSLETTER SUBSCRIPTION SECTION */}
       <NewsletterSection />
     </div>
   );

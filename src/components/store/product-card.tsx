@@ -179,7 +179,7 @@ export function ProductCard({ product, viewMode = 'grid', onQuickView }: Product
 
   // Grid view (Default)
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-300 hover:shadow-luxury-lg hover:-translate-y-1">
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white transition-all duration-500 hover:border-luxury-gold/60 hover:shadow-[0_20px_45px_rgba(201,169,110,0.18)] hover:-translate-y-1.5">
       {/* Product Image Box */}
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-50">
         <Link href={`/san-pham/${product.slug}`} className="block h-full w-full">
@@ -235,9 +235,9 @@ export function ProductCard({ product, viewMode = 'grid', onQuickView }: Product
           <button
             type="button"
             onClick={handleQuickAddToCart}
-            className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-luxury-black/95 text-white backdrop-blur-md py-2.5 text-xs font-semibold uppercase tracking-wider hover:bg-luxury-black shadow-md transition-all active:scale-95"
+            className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-luxury-black via-slate-900 to-luxury-black text-white hover:text-luxury-gold border border-luxury-gold/30 backdrop-blur-md py-2.5 text-xs font-bold uppercase tracking-wider shadow-lg transition-all active:scale-95 hover:border-luxury-gold"
           >
-            <ShoppingBag className="h-3.5 w-3.5" />
+            <ShoppingBag className="h-3.5 w-3.5 text-luxury-gold" />
             <span>Thêm giỏ hàng</span>
           </button>
         </div>
