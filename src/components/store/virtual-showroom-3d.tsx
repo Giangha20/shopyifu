@@ -294,11 +294,24 @@ export function VirtualShowroom3D() {
                           initial={{ opacity: 0, y: 10, scale: 0.9 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10 }}
-                          className="absolute bottom-10 left-1/2 -translate-x-1/2 w-64 p-4 rounded-xl bg-black/90 backdrop-blur-xl border border-luxury-gold/40 shadow-2xl z-40 text-left pointer-events-auto"
+                          className="absolute bottom-10 left-1/2 -translate-x-1/2 w-60 sm:w-64 max-w-[calc(100vw-3rem)] p-3.5 sm:p-4 rounded-xl bg-black/95 backdrop-blur-xl border border-luxury-gold/50 shadow-2xl z-40 text-left pointer-events-auto"
                         >
-                          <div className="flex items-center gap-1.5 text-luxury-gold text-xs font-bold mb-1">
-                            <Sparkles className="w-3.5 h-3.5" />
-                            <span>{spot.title}</span>
+                          <div className="flex items-center justify-between gap-1 mb-1">
+                            <div className="flex items-center gap-1.5 text-luxury-gold text-xs font-bold">
+                              <Sparkles className="w-3.5 h-3.5" />
+                              <span className="truncate">{spot.title}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveHotspot(null);
+                              }}
+                              className="text-slate-400 hover:text-white text-xs p-0.5"
+                              aria-label="Đóng"
+                            >
+                              ✕
+                            </button>
                           </div>
                           <p className="text-xs text-slate-300 leading-relaxed">
                             {spot.description}
@@ -329,25 +342,27 @@ export function VirtualShowroom3D() {
             </div>
 
             {/* Angle Switcher Controls under the Stage */}
-            <div className="mt-6 flex items-center gap-3 bg-white/[0.04] p-2 rounded-2xl border border-white/10">
-              <span className="text-xs text-slate-400 font-medium px-2 flex items-center gap-1.5">
+            <div className="mt-4 sm:mt-6 flex flex-wrap items-center justify-center gap-2 bg-white/[0.04] p-2 sm:p-2.5 rounded-2xl border border-white/10 w-full max-w-[540px]">
+              <span className="text-xs text-slate-400 font-medium px-2 flex items-center gap-1.5 shrink-0">
                 <RotateCw className="w-3.5 h-3.5 text-luxury-gold" />
-                Góc xoay:
+                <span className="hidden sm:inline">Góc xoay:</span>
               </span>
-              {currentItem.angles.map((ang, aIdx) => (
-                <button
-                  key={aIdx}
-                  type="button"
-                  onClick={() => setCurrentAngleIndex(aIdx)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold tracking-wider transition-all ${
-                    currentAngleIndex === aIdx
-                      ? 'bg-luxury-gold text-black shadow-gold font-bold'
-                      : 'text-slate-300 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  {ang.label}
-                </button>
-              ))}
+              <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                {currentItem.angles.map((ang, aIdx) => (
+                  <button
+                    key={aIdx}
+                    type="button"
+                    onClick={() => setCurrentAngleIndex(aIdx)}
+                    className={`px-3 py-1.5 rounded-xl text-2xs sm:text-xs font-semibold tracking-wider transition-all min-h-[34px] ${
+                      currentAngleIndex === aIdx
+                        ? 'bg-luxury-gold text-black shadow-gold font-bold'
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {ang.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

@@ -140,9 +140,9 @@ export function VIPHologramCardSection() {
 
           {/* Right Column: Interactive 3D Holographic Card */}
           <div className="lg:col-span-6 flex flex-col items-center justify-center">
-            <p className="text-xs text-luxury-gold/70 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-luxury-gold animate-ping" />
-              Di chuyển chuột để trải nghiệm hiệu ứng 3D Hologram
+            <p className="text-2xs sm:text-xs text-luxury-gold/80 uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-4 flex items-center gap-2 text-center">
+              <span className="w-2 h-2 rounded-full bg-luxury-gold animate-ping shrink-0" />
+              <span>Chạm hoặc di chuột để trải nghiệm hiệu ứng 3D Hologram</span>
             </p>
 
             <div className="w-full max-w-[460px] aspect-[1.586/1]">
@@ -153,7 +153,7 @@ export function VIPHologramCardSection() {
                 className="rounded-2xl"
               >
                 {/* VIP Black Card Body */}
-                <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-[#1b1c1e] via-[#121314] to-[#080809] p-6 sm:p-8 flex flex-col justify-between overflow-hidden border border-luxury-gold/40 shadow-2xl">
+                <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-[#1b1c1e] via-[#121314] to-[#080809] p-4 sm:p-7 md:p-8 flex flex-col justify-between overflow-hidden border border-luxury-gold/40 shadow-2xl">
                   {/* Subtle carbon weave pattern overlay */}
                   <div
                     className="absolute inset-0 opacity-20 pointer-events-none"
@@ -168,39 +168,39 @@ export function VIPHologramCardSection() {
 
                   {/* Top Bar: Brand & Chip */}
                   <div className="relative z-10 flex items-center justify-between" style={{ transform: 'translateZ(25px)' }}>
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-luxury-gold/20 border border-luxury-gold/60 flex items-center justify-center text-luxury-gold">
-                        <Crown className="w-4 h-4" />
+                    <div className="flex items-center gap-2 sm:gap-2.5">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-luxury-gold/20 border border-luxury-gold/60 flex items-center justify-center text-luxury-gold shrink-0">
+                        <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </div>
                       <div>
-                        <span className="font-serif font-bold text-sm tracking-[0.15em] text-gold-gradient block">
+                        <span className="font-serif font-bold text-xs sm:text-sm tracking-[0.15em] text-gold-gradient block">
                           YIFU ATELIER
                         </span>
-                        <span className="text-[9px] uppercase tracking-widest text-slate-400">
+                        <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-slate-400">
                           HAUTE COUTURE VIP
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-luxury-gold/70">
-                      <Wifi className="w-5 h-5 rotate-90" />
-                      <span className="text-[10px] font-mono tracking-widest text-luxury-gold">
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-luxury-gold/70">
+                      <Wifi className="w-4 h-4 sm:w-5 sm:h-5 rotate-90" />
+                      <span className="text-[9px] sm:text-[10px] font-mono tracking-widest text-luxury-gold">
                         NFC VIP
                       </span>
                     </div>
                   </div>
 
                   {/* Middle: 3D Gold Smart Chip */}
-                  <div className="relative z-10 my-auto py-2" style={{ transform: 'translateZ(35px)' }}>
-                    <div className="w-12 h-9 rounded-md bg-gradient-to-br from-[#f5d77f] via-[#c4973b] to-[#805e1b] border border-[#ffe599] shadow-md relative overflow-hidden">
+                  <div className="relative z-10 my-auto py-1 sm:py-2" style={{ transform: 'translateZ(35px)' }}>
+                    <div className="w-9 sm:w-12 h-7 sm:h-9 rounded-md bg-gradient-to-br from-[#f5d77f] via-[#c4973b] to-[#805e1b] border border-[#ffe599] shadow-md relative overflow-hidden">
                       <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[1px] bg-black/40" />
                       <div className="absolute inset-y-0 left-1/3 w-[1px] bg-black/40" />
                       <div className="absolute inset-y-0 right-1/3 w-[1px] bg-black/40" />
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border border-black/30" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 sm:w-4 h-3 sm:h-4 rounded-full border border-black/30" />
                     </div>
 
                     {/* Embossed Card Number */}
-                    <div className="mt-4 font-mono text-base sm:text-xl font-bold tracking-[0.25em] text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                    <div className="mt-2.5 sm:mt-4 font-mono text-xs sm:text-base md:text-xl font-bold tracking-[0.14em] sm:tracking-[0.25em] text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] whitespace-nowrap">
                       8888 &bull; 9999 &bull; 2026 &bull; 7777
                     </div>
                   </div>

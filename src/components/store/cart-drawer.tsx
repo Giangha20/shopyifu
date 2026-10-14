@@ -267,7 +267,7 @@ export function CartDrawer() {
 
               {/* Footer Section */}
               {items.length > 0 && (
-                <div className="p-6 bg-slate-50 border-t border-gray-200 space-y-4">
+                <div className="p-5 sm:p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] bg-slate-50 border-t border-gray-200 space-y-4">
                   {/* Summary */}
                   <div className="space-y-1.5 text-sm">
                     <div className="flex justify-between text-slate-600">

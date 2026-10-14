@@ -658,6 +658,36 @@ export default function ProductDetailClient({ initialProduct }: ProductDetailCli
           </div>
         )}
       </div>
+
+      {/* Sticky Mobile Add-to-Cart Bar */}
+      <div className="md:hidden fixed bottom-16 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 py-2.5 flex items-center justify-between gap-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
+        <div className="min-w-0">
+          <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Giá bán</span>
+          <span className="font-serif text-base font-bold text-luxury-black truncate block">
+            {formatPrice(currentPrice)}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={product.quantity <= 0 || isAdding}
+            className="px-3.5 py-2.5 rounded-xl border border-luxury-black bg-white text-luxury-black text-xs font-bold flex items-center gap-1.5 active:scale-95 transition-all shadow-xs"
+          >
+            <ShoppingBag className="w-3.5 h-3.5" />
+            <span>{isAdding ? '...' : 'Thêm giỏ'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleBuyNow}
+            disabled={product.quantity <= 0}
+            className="px-4 py-2.5 rounded-xl bg-luxury-black text-white text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 transition-all"
+          >
+            <span>Mua ngay</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

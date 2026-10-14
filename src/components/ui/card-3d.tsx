@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 
 interface Card3DProps {
@@ -21,6 +21,13 @@ export function Card3D({
 }: Card3DProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsTouchDevice(window.matchMedia('(hover: none)').matches || 'ontouchstart' in window);
+    }
+  }, []);
 
   // Mouse coordinate values normalized from -1 to 1
   const x = useMotionValue(0);
@@ -30,9 +37,10 @@ export function Card3D({
   const mouseXSpring = useSpring(x, { stiffness: 220, damping: 22 });
   const mouseYSpring = useSpring(y, { stiffness: 220, damping: 22 });
 
-  // 3D rotations based on spring coordinates
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], [maxRotate, -maxRotate]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], [-maxRotate, maxRotate]);
+  // 3D rotations based on spring coordinates (0 on touch devices for fluid native scroll)
+  const effectiveRotate = isTouchDevice ? 0 : maxRotate;
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], [effectiveRotate, -effectiveRotate]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], [-effectiveRotate, effectiveRotate]);
 
   // Glare position percentage
   const glareX = useTransform(mouseXSpring, [-0.5, 0.5], ['0%', '100%']);
@@ -40,7 +48,7 @@ export function Card3D({
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!cardRef.current) return;
+      if (isTouchDevice || !cardRef.current) return;
       const rect = cardRef.current.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
@@ -51,11 +59,13 @@ export function Card3D({
       x.set(xPct);
       y.set(yPct);
     },
-    [x, y]
+    [x, y, isTouchDevice]
   );
 
   const handleMouseEnter = () => {
-    setIsHovered(true);
+    if (!isTouchDevice) {
+      setIsHovered(true);
+    }
   };
 
   const handleMouseLeave = () => {
@@ -66,11 +76,12 @@ export function Card3D({
 
   return (
     <div
-      style={{ perspective: 1200 }}
+      style={{ perspective: 1200, touchAction: 'pan-y' }}
       className="relative w-full h-full"
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onTouchEnd={handleMouseLeave}
     >
       <motion.div
         ref={cardRef}

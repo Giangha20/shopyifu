@@ -220,8 +220,8 @@ export function ProductCard({ product, viewMode = 'grid', onQuickView }: Product
           <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-rose-500' : ''}`} />
         </button>
 
-        {/* Floating Quick Action Overlay */}
-        <div className="absolute inset-x-3 bottom-3 z-10 flex gap-2 translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-luxury">
+        {/* Floating Quick Action Overlay (Desktop) */}
+        <div className="hidden md:flex absolute inset-x-3 bottom-3 z-10 gap-2 translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-luxury">
           {onQuickView && (
             <button
               type="button"
@@ -244,7 +244,7 @@ export function ProductCard({ product, viewMode = 'grid', onQuickView }: Product
       </div>
 
       {/* Info Container */}
-      <div className="flex flex-1 flex-col p-4">
+      <div className="flex flex-1 flex-col p-3 sm:p-4">
         {product.brand && (
           <p className="text-2xs font-semibold uppercase tracking-widest text-slate-400">
             {product.brand}
@@ -252,30 +252,30 @@ export function ProductCard({ product, viewMode = 'grid', onQuickView }: Product
         )}
         <Link
           href={`/san-pham/${product.slug}`}
-          className="mt-1 block font-serif text-sm sm:text-base font-semibold text-slate-900 group-hover:text-luxury-gold transition-colors line-clamp-1"
+          className="mt-1 block font-serif text-xs sm:text-base font-semibold text-slate-900 group-hover:text-luxury-gold transition-colors line-clamp-1"
         >
           {product.name}
         </Link>
 
         {/* Rating summary */}
-        <div className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-500">
+        <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
           <div className="flex items-center text-amber-500">
             <Star className="h-3 w-3 fill-amber-400 stroke-amber-400" />
-            <span className="ml-1 font-medium text-slate-700">
+            <span className="ml-1 text-2xs sm:text-xs font-medium text-slate-700">
               {(Number(product.avgRating) || 5.0).toFixed(1)}
             </span>
           </div>
           <span>•</span>
-          <span className="text-slate-400">Đã bán {product.soldCount ?? 0}</span>
+          <span className="text-2xs sm:text-xs text-slate-400">Đã bán {product.soldCount ?? 0}</span>
         </div>
 
         {/* Color swatches preview if variants have colors */}
         {product.variants && product.variants.length > 1 && (
-          <div className="mt-2.5 flex items-center gap-1.5">
+          <div className="mt-2 flex items-center gap-1.5">
             {Array.from(new Set(product.variants.map((v) => v.color).filter(Boolean))).slice(0, 4).map((color, idx) => (
               <span
                 key={idx}
-                className="inline-block h-3 w-3 rounded-full border border-gray-300 bg-slate-300"
+                className="inline-block h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full border border-gray-300 bg-slate-300"
                 title={color || ''}
                 style={{
                   backgroundColor:
@@ -293,16 +293,29 @@ export function ProductCard({ product, viewMode = 'grid', onQuickView }: Product
           </div>
         )}
 
-        {/* Price Section */}
-        <div className="mt-auto pt-3 flex items-baseline gap-2">
-          <span className="font-serif text-base sm:text-lg font-bold text-luxury-black">
-            {formatPrice(product.price)}
-          </span>
-          {product.compareAtPrice && product.compareAtPrice > product.price && (
-            <span className="text-xs text-slate-400 line-through">
-              {formatPrice(product.compareAtPrice)}
+        {/* Price Section with Mobile Quick Add Button */}
+        <div className="mt-auto pt-2.5 sm:pt-3 flex items-center justify-between gap-1.5">
+          <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
+            <span className="font-serif text-sm sm:text-lg font-bold text-luxury-black">
+              {formatPrice(product.price)}
             </span>
-          )}
+            {product.compareAtPrice && product.compareAtPrice > product.price && (
+              <span className="text-[10px] sm:text-xs text-slate-400 line-through">
+                {formatPrice(product.compareAtPrice)}
+              </span>
+            )}
+          </div>
+
+          {/* Mobile Quick Add Button (1-touch on phone) */}
+          <button
+            type="button"
+            onClick={handleQuickAddToCart}
+            className="md:hidden flex h-8 w-8 items-center justify-center rounded-lg bg-luxury-black text-luxury-gold hover:bg-luxury-gold hover:text-black transition-colors shrink-0 shadow-sm active:scale-90"
+            title="Thêm vào giỏ"
+            aria-label="Thêm vào giỏ"
+          >
+            <ShoppingBag className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </div>

@@ -101,7 +101,7 @@ export function CategoryGrid() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="sm:col-span-2 lg:col-span-7 h-[420px] sm:h-[480px] lg:h-[520px] relative rounded-3xl"
+            className="sm:col-span-2 lg:col-span-7 h-[340px] sm:h-[440px] lg:h-[520px] relative rounded-3xl"
           >
             <Card3D maxRotate={7} glareOpacity={0.2} borderGlow={true} className="rounded-3xl overflow-hidden shadow-lg border border-slate-100">
               <Link href={CATEGORIES[0].link} className="block w-full h-full relative group">
@@ -114,14 +114,14 @@ export function CategoryGrid() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
-                <div className="absolute inset-0 p-8 sm:p-10 flex flex-col justify-end text-white">
-                  <span className="text-xs uppercase tracking-widest text-luxury-gold font-semibold mb-2">
+                <div className="absolute inset-0 p-6 sm:p-10 flex flex-col justify-end text-white">
+                  <span className="text-xs uppercase tracking-widest text-luxury-gold font-semibold mb-1.5">
                     {CATEGORIES[0].itemCount}
                   </span>
-                  <h3 className="font-serif text-2xl sm:text-4xl font-bold mb-2">
+                  <h3 className="font-serif text-xl sm:text-3xl lg:text-4xl font-bold mb-1.5">
                     {CATEGORIES[0].name}
                   </h3>
-                  <p className="text-sm sm:text-base text-slate-300 mb-6 max-w-md font-light">
+                  <p className="text-xs sm:text-base text-slate-300 mb-4 sm:mb-6 max-w-md font-light line-clamp-2">
                     {CATEGORIES[0].subtitle}
                   </p>
 
@@ -140,7 +140,7 @@ export function CategoryGrid() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="sm:col-span-2 lg:col-span-5 h-[420px] sm:h-[480px] lg:h-[520px] relative rounded-3xl"
+            className="sm:col-span-2 lg:col-span-5 h-[340px] sm:h-[440px] lg:h-[520px] relative rounded-3xl"
           >
             <Card3D maxRotate={9} glareOpacity={0.3} borderGlow={true} className="rounded-3xl overflow-hidden shadow-lg border-2 border-luxury-gold/50">
               <Link href={CATEGORIES[1].link} className="block w-full h-full relative group">
@@ -154,25 +154,25 @@ export function CategoryGrid() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
                 {/* Special Tag */}
-                <div className="absolute top-6 left-6 z-10">
-                  <span className="badge-gold text-xs px-3 py-1 font-bold shadow-md flex items-center gap-1.5">
+                <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-10">
+                  <span className="badge-gold text-2xs sm:text-xs px-2.5 sm:px-3 py-1 font-bold shadow-md flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>DỊCH VỤ THUÊ ĐỒ 5 SAO</span>
                   </span>
                 </div>
 
-                <div className="absolute inset-0 p-8 sm:p-10 flex flex-col justify-end text-white">
-                  <span className="text-xs uppercase tracking-widest text-luxury-gold font-bold mb-2">
+                <div className="absolute inset-0 p-6 sm:p-10 flex flex-col justify-end text-white">
+                  <span className="text-xs uppercase tracking-widest text-luxury-gold font-bold mb-1.5">
                     {CATEGORIES[1].itemCount}
                   </span>
-                  <h3 className="font-serif text-2xl sm:text-3xl font-bold mb-2">
+                  <h3 className="font-serif text-xl sm:text-3xl font-bold mb-1.5">
                     {CATEGORIES[1].name}
                   </h3>
-                  <p className="text-sm text-slate-300 mb-6 font-light">
+                  <p className="text-xs sm:text-sm text-slate-300 mb-4 sm:mb-6 font-light line-clamp-2">
                     {CATEGORIES[1].subtitle}
                   </p>
 
-                  <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-luxury-gold group-hover:text-white transition-colors bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 w-fit">
+                  <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-luxury-gold group-hover:text-white transition-colors bg-white/10 backdrop-blur-md px-3.5 sm:px-4 py-2 rounded-xl border border-white/20 w-fit">
                     <span>Khám phá tủ đồ thuê</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
                   </div>
@@ -189,7 +189,7 @@ export function CategoryGrid() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 * index }}
-              className="sm:col-span-1 lg:col-span-4 h-[280px] sm:h-[320px] relative rounded-3xl"
+              className="sm:col-span-1 lg:col-span-4 h-[230px] sm:h-[280px] lg:h-[320px] relative rounded-3xl"
             >
               <Card3D maxRotate={8} glareOpacity={0.2} borderGlow={true} className="rounded-3xl overflow-hidden shadow-md border border-slate-100">
                 <Link href={cat.link} className="block w-full h-full relative group">

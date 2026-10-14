@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Grid, Search, Heart, User } from 'lucide-react';
+import { Home, Grid, Search, Heart, User, Crown, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWishlist } from '@/hooks/use-wishlist';
 
@@ -12,6 +12,7 @@ interface NavItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: number;
+  isSpecial?: boolean;
 }
 
 export function MobileBottomNav({ onSearchClick }: { onSearchClick?: () => void }) {
@@ -35,9 +36,10 @@ export function MobileBottomNav({ onSearchClick }: { onSearchClick?: () => void 
       icon: Grid,
     },
     {
-      label: 'Tìm kiếm',
-      href: '/tim-kiem',
-      icon: Search,
+      label: 'Thuê đồ',
+      href: '/thue-do',
+      icon: Crown,
+      isSpecial: true,
     },
     {
       label: 'Yêu thích',
@@ -50,13 +52,12 @@ export function MobileBottomNav({ onSearchClick }: { onSearchClick?: () => void 
       href: '/tai-khoan',
       icon: User,
     },
-
   ];
 
   return (
     <nav
       aria-label="Thanh điều hướng di động"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200/80 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom)]"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200/80 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] pb-[env(safe-area-inset-bottom)]"
     >
       <div className="grid grid-cols-5 h-16 items-center px-1">
         {navItems.map((item) => {
@@ -66,24 +67,32 @@ export function MobileBottomNav({ onSearchClick }: { onSearchClick?: () => void 
               ? pathname === '/'
               : pathname.startsWith(item.href);
 
-          if (item.label === 'Tìm kiếm' && onSearchClick) {
+          if (item.isSpecial) {
             return (
-              <button
-                key={item.label}
-                type="button"
-                onClick={onSearchClick}
-                className={cn(
-                  'relative flex flex-col items-center justify-center h-full py-1 text-slate-500 transition-colors',
-                  isActive && 'text-luxury-black font-semibold'
-                )}
+              <Link
+                key={item.href}
+                href={item.href}
+                className="relative flex flex-col items-center justify-center -mt-3.5 group"
               >
-                <div className="relative p-1">
+                <div
+                  className={cn(
+                    'w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-transform duration-200 active:scale-95',
+                    isActive
+                      ? 'bg-gradient-to-tr from-luxury-gold to-amber-400 text-slate-950 shadow-gold'
+                      : 'bg-luxury-black text-luxury-gold border-2 border-luxury-gold/50'
+                  )}
+                >
                   <Icon className="w-5 h-5 transition-transform group-hover:scale-110" />
                 </div>
-                <span className="text-[10px] leading-tight mt-0.5 tracking-tight">
+                <span
+                  className={cn(
+                    'text-[10px] font-bold leading-tight mt-1 tracking-tight',
+                    isActive ? 'text-luxury-gold' : 'text-slate-800'
+                  )}
+                >
                   {item.label}
                 </span>
-              </button>
+              </Link>
             );
           }
 

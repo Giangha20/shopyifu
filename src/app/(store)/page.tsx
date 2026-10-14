@@ -480,7 +480,7 @@ export default function HomePage() {
           </div>
 
           {/* 4 Featured Rental Outfits Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {RENTAL_HIGHLIGHTS.map((item) => (
               <div key={item.id} className="h-full">
                 <Card3D maxRotate={10} glareOpacity={0.25} borderGlow={true} className="rounded-3xl overflow-hidden bg-white/5 border border-white/10 hover:border-luxury-gold/60 transition-colors">
@@ -528,7 +528,7 @@ export default function HomePage() {
                     </div>
 
                     {/* Details */}
-                    <div className="p-5 flex flex-col flex-1">
+                    <div className="p-4 sm:p-5 flex flex-col flex-1">
                       <span className="text-2xs uppercase tracking-wider text-luxury-gold font-semibold mb-1">
                         {item.category}
                       </span>
@@ -553,13 +553,13 @@ export default function HomePage() {
           </div>
 
           {/* 3 VIP Rental Privileges */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 pt-12 border-t border-white/10">
-            <div className="flex items-start gap-4 p-5 rounded-2xl bg-white/5 border border-white/10">
-              <div className="w-11 h-11 rounded-xl bg-luxury-gold/20 border border-luxury-gold/40 flex items-center justify-center shrink-0">
-                <Scissors className="w-5 h-5 text-luxury-gold" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-6 mt-8 sm:mt-12 pt-8 sm:pt-12 border-t border-white/10">
+            <div className="flex items-start gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-white/5 border border-white/10">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-luxury-gold/20 border border-luxury-gold/40 flex items-center justify-center shrink-0">
+                <Scissors className="w-4 h-4 sm:w-5 sm:h-5 text-luxury-gold" />
               </div>
               <div>
-                <h4 className="font-serif text-base font-bold text-white mb-1">
+                <h4 className="font-serif text-sm sm:text-base font-bold text-white mb-1">
                   Thử Đồ & Chỉnh Sửa Chuẩn Phom
                 </h4>
                 <p className="text-xs text-slate-300 leading-relaxed font-light">
@@ -568,12 +568,12 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex items-start gap-4 p-5 rounded-2xl bg-white/5 border border-white/10">
-              <div className="w-11 h-11 rounded-xl bg-luxury-gold/20 border border-luxury-gold/40 flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-5 h-5 text-luxury-gold" />
+            <div className="flex items-start gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-white/5 border border-white/10">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-luxury-gold/20 border border-luxury-gold/40 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-luxury-gold" />
               </div>
               <div>
-                <h4 className="font-serif text-base font-bold text-white mb-1">
+                <h4 className="font-serif text-sm sm:text-base font-bold text-white mb-1">
                   Giặt Hấp Tiệt Trùng Sinh Học 5 Sao
                 </h4>
                 <p className="text-xs text-slate-300 leading-relaxed font-light">
@@ -582,12 +582,12 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex items-start gap-4 p-5 rounded-2xl bg-white/5 border border-white/10">
-              <div className="w-11 h-11 rounded-xl bg-luxury-gold/20 border border-luxury-gold/40 flex items-center justify-center shrink-0">
-                <Sparkles className="w-5 h-5 text-luxury-gold" />
+            <div className="flex items-start gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-white/5 border border-white/10">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-luxury-gold/20 border border-luxury-gold/40 flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-luxury-gold" />
               </div>
               <div>
-                <h4 className="font-serif text-base font-bold text-white mb-1">
+                <h4 className="font-serif text-sm sm:text-base font-bold text-white mb-1">
                   Giao Hỏa Tốc & Miễn Phí Phụ Kiện
                 </h4>
                 <p className="text-xs text-slate-300 leading-relaxed font-light">
@@ -632,39 +632,39 @@ export default function HomePage() {
 
               {/* Countdown Display */}
               <div className="pt-2">
-                <div className="grid grid-cols-4 gap-3 sm:gap-4 max-w-md">
-                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-4 text-center border border-white/15">
-                    <span className="block font-serif text-2xl sm:text-3xl font-bold text-luxury-gold">
+                <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-md">
+                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-2.5 sm:p-4 text-center border border-white/15">
+                    <span className="block font-serif text-xl sm:text-3xl font-bold text-luxury-gold">
                       {String(timeLeft.days).padStart(2, '0')}
                     </span>
-                    <span className="text-[10px] sm:text-xs text-slate-300 uppercase font-medium">
+                    <span className="text-[9px] sm:text-xs text-slate-300 uppercase font-medium">
                       Ngày
                     </span>
                   </div>
 
-                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-4 text-center border border-white/15">
-                    <span className="block font-serif text-2xl sm:text-3xl font-bold text-luxury-gold">
+                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-2.5 sm:p-4 text-center border border-white/15">
+                    <span className="block font-serif text-xl sm:text-3xl font-bold text-luxury-gold">
                       {String(timeLeft.hours).padStart(2, '0')}
                     </span>
-                    <span className="text-[10px] sm:text-xs text-slate-300 uppercase font-medium">
+                    <span className="text-[9px] sm:text-xs text-slate-300 uppercase font-medium">
                       Giờ
                     </span>
                   </div>
 
-                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-4 text-center border border-white/15">
-                    <span className="block font-serif text-2xl sm:text-3xl font-bold text-luxury-gold">
+                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-2.5 sm:p-4 text-center border border-white/15">
+                    <span className="block font-serif text-xl sm:text-3xl font-bold text-luxury-gold">
                       {String(timeLeft.minutes).padStart(2, '0')}
                     </span>
-                    <span className="text-[10px] sm:text-xs text-slate-300 uppercase font-medium">
+                    <span className="text-[9px] sm:text-xs text-slate-300 uppercase font-medium">
                       Phút
                     </span>
                   </div>
 
-                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-4 text-center border border-white/15">
-                    <span className="block font-serif text-2xl sm:text-3xl font-bold text-luxury-gold">
+                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-2.5 sm:p-4 text-center border border-white/15">
+                    <span className="block font-serif text-xl sm:text-3xl font-bold text-luxury-gold">
                       {String(timeLeft.seconds).padStart(2, '0')}
                     </span>
-                    <span className="text-[10px] sm:text-xs text-slate-300 uppercase font-medium">
+                    <span className="text-[9px] sm:text-xs text-slate-300 uppercase font-medium">
                       Giây
                     </span>
                   </div>
@@ -673,8 +673,8 @@ export default function HomePage() {
 
               <div className="pt-4">
                 <Link
-                  href="/promotions"
-                  className="btn-gold px-8 py-4 rounded-xl text-sm font-semibold tracking-wider uppercase inline-flex items-center gap-2 shadow-glow"
+                  href="/san-pham"
+                  className="btn-gold w-full sm:w-auto px-8 py-4 rounded-xl text-xs sm:text-sm font-semibold tracking-wider uppercase inline-flex items-center justify-center gap-2 shadow-glow text-center"
                 >
                   <span>Khám phá ưu đãi ngay</span>
                   <ArrowRight className="w-4 h-4" />
@@ -693,23 +693,23 @@ export default function HomePage() {
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6 p-4 rounded-xl bg-black/75 backdrop-blur-md border border-luxury-gold/30 shadow-2xl">
-                  <div className="flex items-center justify-between gap-3">
+                <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 p-3.5 sm:p-4 rounded-xl bg-black/75 backdrop-blur-md border border-luxury-gold/30 shadow-2xl">
+                  <div className="flex items-center justify-between gap-2.5">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs uppercase tracking-wider text-luxury-gold font-bold">
+                        <span className="text-2xs sm:text-xs uppercase tracking-wider text-luxury-gold font-bold">
                           VOUCHER: LUXE40
                         </span>
-                        <span className="badge-sale text-[10px] px-2 py-0.5">GIẢM 40%</span>
+                        <span className="badge-sale text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5">GIẢM 40%</span>
                       </div>
-                      <p className="text-sm font-serif font-bold text-white mt-0.5">
+                      <p className="text-xs sm:text-sm font-serif font-bold text-white mt-0.5">
                         Áp dụng toàn bộ đơn hàng
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={handleCopyVoucher}
-                      className="px-3.5 py-2 rounded-lg bg-luxury-gold text-luxury-black hover:bg-luxury-gold-light active:scale-95 transition-all text-xs font-bold inline-flex items-center gap-1.5 shrink-0 shadow-gold"
+                      className="px-3 sm:px-3.5 py-2 rounded-lg bg-luxury-gold text-luxury-black hover:bg-luxury-gold-light active:scale-95 transition-all text-xs font-bold inline-flex items-center gap-1.5 shrink-0 shadow-gold"
                       title="Sao chép mã giảm giá"
                     >
                       {hasCopiedVoucher ? (
