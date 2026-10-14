@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, EffectFade, Pagination, Navigation } from 'swiper/modules';
 import { ArrowRight, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ThreeHeroCanvas } from '@/components/store/three-hero-canvas';
 
 // Swiper styles
 import 'swiper/css';
@@ -111,7 +112,7 @@ export function HeroBanner() {
             <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/30" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
           </div>
-          <div className="relative z-10 h-full container-luxe mx-auto flex items-center">
+          <div className="relative z-10 h-full container-luxe mx-auto flex items-center justify-between">
             <div className="max-w-2xl px-4 sm:px-6 lg:px-8 py-12">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-4 sm:mb-6">
                 <Sparkles className="w-3.5 h-3.5 text-luxury-gold" />
@@ -142,6 +143,15 @@ export function HeroBanner() {
                 >
                   <span>{slide.secondaryCtaText}</span>
                 </Link>
+              </div>
+            </div>
+
+            {/* Interactive 3D WebGL Jewel Showcase */}
+            <div className="hidden lg:flex flex-col items-center justify-center w-[420px] h-[420px] relative pointer-events-auto pr-8">
+              <ThreeHeroCanvas />
+              <div className="absolute bottom-2 px-4 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-luxury-gold/40 text-[10px] font-mono tracking-widest text-luxury-gold shadow-gold flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-luxury-gold" />
+                <span>3D ATELIER SHOWCASE</span>
               </div>
             </div>
           </div>
@@ -192,7 +202,7 @@ export function HeroBanner() {
             </div>
 
             {/* Slide Content */}
-            <div className="relative z-10 h-full container-luxe mx-auto flex items-center">
+            <div className="relative z-10 h-full container-luxe mx-auto flex items-center justify-between">
               <div className="max-w-2xl px-4 sm:px-6 lg:px-8 py-12">
                 {/* Badge */}
                 <motion.div
@@ -256,6 +266,15 @@ export function HeroBanner() {
                     <span>{slide.secondaryCtaText}</span>
                   </Link>
                 </motion.div>
+              </div>
+
+              {/* Interactive 3D WebGL Jewel Showcase */}
+              <div className="hidden lg:flex flex-col items-center justify-center w-[420px] h-[420px] relative pointer-events-auto pr-8">
+                <ThreeHeroCanvas />
+                <div className="absolute bottom-2 px-4 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-luxury-gold/40 text-[10px] font-mono tracking-widest text-luxury-gold shadow-gold flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5 text-luxury-gold" />
+                  <span>3D ATELIER SHOWCASE</span>
+                </div>
               </div>
             </div>
           </SwiperSlide>

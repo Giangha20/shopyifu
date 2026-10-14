@@ -30,6 +30,9 @@ import { CategoryGrid } from '@/components/store/category-grid';
 import { ProductCard, type ProductItem } from '@/components/store/product-card';
 import { TrustBadges } from '@/components/store/trust-badges';
 import { NewsletterSection } from '@/components/store/newsletter-section';
+import { VirtualShowroom3D } from '@/components/store/virtual-showroom-3d';
+import { VIPHologramCardSection } from '@/components/store/vip-hologram-card';
+import { Card3D } from '@/components/ui/card-3d';
 import { SAMPLE_PRODUCTS } from '@/lib/sample-data';
 
 // Curated Luxury Products for "Sản Phẩm Mới" (New Arrivals)
@@ -479,71 +482,72 @@ export default function HomePage() {
           {/* 4 Featured Rental Outfits Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {RENTAL_HIGHLIGHTS.map((item) => (
-              <div
-                key={item.id}
-                className="group relative flex flex-col rounded-3xl overflow-hidden bg-white/5 border border-white/10 hover:border-luxury-gold/60 transition-all duration-500 hover:shadow-[0_20px_45px_rgba(201,169,110,0.2)] hover:-translate-y-1.5"
-              >
-                {/* Image */}
-                <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-900">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+              <div key={item.id} className="h-full">
+                <Card3D maxRotate={10} glareOpacity={0.25} borderGlow={true} className="rounded-3xl overflow-hidden bg-white/5 border border-white/10 hover:border-luxury-gold/60 transition-colors">
+                  <div className="group relative flex flex-col h-full">
+                    {/* Image */}
+                    <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-900">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
 
-                  {/* Badge */}
-                  <div className="absolute top-3 left-3 z-10">
-                    <span className="badge-gold text-[10px] px-2.5 py-0.5 font-bold shadow-md">
-                      {item.badge}
-                    </span>
-                  </div>
-
-                  {/* Rental Tag Callout */}
-                  <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-black/60 backdrop-blur-md border border-white/15">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-[10px] uppercase tracking-wider text-slate-300 block">
-                          Giá thuê từ:
-                        </span>
-                        <span className="font-serif text-base font-bold text-luxury-gold">
-                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.rentalPrice)}
-                          <span className="text-2xs font-normal text-slate-300">/ngày</span>
+                      {/* Badge */}
+                      <div className="absolute top-3 left-3 z-10">
+                        <span className="badge-gold text-[10px] px-2.5 py-0.5 font-bold shadow-md">
+                          {item.badge}
                         </span>
                       </div>
-                      <div className="text-right">
-                        <span className="text-[9px] text-slate-400 block line-through">
-                          Gốc: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.retailPrice)}
-                        </span>
-                        <span className="text-[10px] font-bold text-emerald-400">
-                          Tiết kiệm 95%
-                        </span>
+
+                      {/* Rental Tag Callout */}
+                      <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-black/60 backdrop-blur-md border border-white/15">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-[10px] uppercase tracking-wider text-slate-300 block">
+                              Giá thuê từ:
+                            </span>
+                            <span className="font-serif text-base font-bold text-luxury-gold">
+                              {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.rentalPrice)}
+                              <span className="text-2xs font-normal text-slate-300">/ngày</span>
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-[9px] text-slate-400 block line-through">
+                              Gốc: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.retailPrice)}
+                            </span>
+                            <span className="text-[10px] font-bold text-emerald-400">
+                              Tiết kiệm 95%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    <div className="p-5 flex flex-col flex-1">
+                      <span className="text-2xs uppercase tracking-wider text-luxury-gold font-semibold mb-1">
+                        {item.category}
+                      </span>
+                      <h3 className="font-serif text-base font-bold text-white group-hover:text-luxury-gold transition-colors line-clamp-1 mb-4">
+                        {item.name}
+                      </h3>
+
+                      <div className="mt-auto">
+                        <Link
+                          href={item.link}
+                          className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-luxury-gold hover:text-slate-950 text-white text-xs font-bold transition-all border border-white/20 active:scale-95"
+                        >
+                          <span>Xem lịch thuê & Đặt đồ</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Details */}
-                <div className="p-5 flex flex-col flex-1">
-                  <span className="text-2xs uppercase tracking-wider text-luxury-gold font-semibold mb-1">
-                    {item.category}
-                  </span>
-                  <h3 className="font-serif text-base font-bold text-white group-hover:text-luxury-gold transition-colors line-clamp-1 mb-4">
-                    {item.name}
-                  </h3>
-
-                  <div className="mt-auto">
-                    <Link
-                      href={item.link}
-                      className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-luxury-gold hover:text-slate-950 text-white text-xs font-bold transition-all border border-white/20 active:scale-95"
-                    >
-                      <span>Xem lịch thuê & Đặt đồ</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
-                </div>
+                </Card3D>
               </div>
             ))}
           </div>
@@ -867,7 +871,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 8. CUSTOMER REVIEWS (TESTIMONIALS) */}
+      {/* 8. 3D INTERACTIVE VIRTUAL SHOWROOM STAGE */}
+      <VirtualShowroom3D />
+
+      {/* 9. 3D HOLOGRAPHIC VIP PRIVILEGE BLACK CARD */}
+      <VIPHologramCardSection />
+
+      {/* 10. CUSTOMER REVIEWS (TESTIMONIALS) */}
       <section className="py-20 sm:py-24 bg-white">
         <div className="container-luxe mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">

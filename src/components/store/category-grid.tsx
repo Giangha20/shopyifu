@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import { Card3D } from '@/components/ui/card-3d';
 
 interface CategoryCard {
   id: string;
@@ -100,35 +101,37 @@ export function CategoryGrid() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="sm:col-span-2 lg:col-span-7 h-[420px] sm:h-[480px] lg:h-[520px] relative rounded-3xl overflow-hidden group shadow-lg border border-slate-100"
+            className="sm:col-span-2 lg:col-span-7 h-[420px] sm:h-[480px] lg:h-[520px] relative rounded-3xl"
           >
-            <Link href={CATEGORIES[0].link} className="block w-full h-full relative">
-              <Image
-                src={CATEGORIES[0].image}
-                alt={CATEGORIES[0].name}
-                fill
-                sizes="(max-width: 1024px) 100vw, 60vw"
-                className="object-cover transition-transform duration-700 ease-luxury group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+            <Card3D maxRotate={7} glareOpacity={0.2} borderGlow={true} className="rounded-3xl overflow-hidden shadow-lg border border-slate-100">
+              <Link href={CATEGORIES[0].link} className="block w-full h-full relative group">
+                <Image
+                  src={CATEGORIES[0].image}
+                  alt={CATEGORIES[0].name}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  className="object-cover transition-transform duration-700 ease-luxury group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
-              <div className="absolute inset-0 p-8 sm:p-10 flex flex-col justify-end text-white">
-                <span className="text-xs uppercase tracking-widest text-luxury-gold font-semibold mb-2">
-                  {CATEGORIES[0].itemCount}
-                </span>
-                <h3 className="font-serif text-2xl sm:text-4xl font-bold mb-2">
-                  {CATEGORIES[0].name}
-                </h3>
-                <p className="text-sm sm:text-base text-slate-300 mb-6 max-w-md font-light">
-                  {CATEGORIES[0].subtitle}
-                </p>
+                <div className="absolute inset-0 p-8 sm:p-10 flex flex-col justify-end text-white">
+                  <span className="text-xs uppercase tracking-widest text-luxury-gold font-semibold mb-2">
+                    {CATEGORIES[0].itemCount}
+                  </span>
+                  <h3 className="font-serif text-2xl sm:text-4xl font-bold mb-2">
+                    {CATEGORIES[0].name}
+                  </h3>
+                  <p className="text-sm sm:text-base text-slate-300 mb-6 max-w-md font-light">
+                    {CATEGORIES[0].subtitle}
+                  </p>
 
-                <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-luxury-gold group-hover:text-white transition-colors">
-                  <span>Khám phá bộ sưu tập</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                  <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-luxury-gold group-hover:text-white transition-colors">
+                    <span>Khám phá bộ sưu tập</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </Card3D>
           </motion.div>
 
           {/* Card 2: Dịch Vụ Thuê Đồ Sự Kiện & Dạ Hội (lg:col-span-5) */}
@@ -137,43 +140,45 @@ export function CategoryGrid() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="sm:col-span-2 lg:col-span-5 h-[420px] sm:h-[480px] lg:h-[520px] relative rounded-3xl overflow-hidden group shadow-lg border-2 border-luxury-gold/50"
+            className="sm:col-span-2 lg:col-span-5 h-[420px] sm:h-[480px] lg:h-[520px] relative rounded-3xl"
           >
-            <Link href={CATEGORIES[1].link} className="block w-full h-full relative">
-              <Image
-                src={CATEGORIES[1].image}
-                alt={CATEGORIES[1].name}
-                fill
-                sizes="(max-width: 1024px) 100vw, 40vw"
-                className="object-cover transition-transform duration-700 ease-luxury group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+            <Card3D maxRotate={9} glareOpacity={0.3} borderGlow={true} className="rounded-3xl overflow-hidden shadow-lg border-2 border-luxury-gold/50">
+              <Link href={CATEGORIES[1].link} className="block w-full h-full relative group">
+                <Image
+                  src={CATEGORIES[1].image}
+                  alt={CATEGORIES[1].name}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="object-cover transition-transform duration-700 ease-luxury group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
-              {/* Special Tag */}
-              <div className="absolute top-6 left-6 z-10">
-                <span className="badge-gold text-xs px-3 py-1 font-bold shadow-md flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>DỊCH VỤ THUÊ ĐỒ 5 SAO</span>
-                </span>
-              </div>
-
-              <div className="absolute inset-0 p-8 sm:p-10 flex flex-col justify-end text-white">
-                <span className="text-xs uppercase tracking-widest text-luxury-gold font-bold mb-2">
-                  {CATEGORIES[1].itemCount}
-                </span>
-                <h3 className="font-serif text-2xl sm:text-3xl font-bold mb-2">
-                  {CATEGORIES[1].name}
-                </h3>
-                <p className="text-sm text-slate-300 mb-6 font-light">
-                  {CATEGORIES[1].subtitle}
-                </p>
-
-                <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-luxury-gold group-hover:text-white transition-colors bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 w-fit">
-                  <span>Khám phá tủ đồ thuê</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                {/* Special Tag */}
+                <div className="absolute top-6 left-6 z-10">
+                  <span className="badge-gold text-xs px-3 py-1 font-bold shadow-md flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>DỊCH VỤ THUÊ ĐỒ 5 SAO</span>
+                  </span>
                 </div>
-              </div>
-            </Link>
+
+                <div className="absolute inset-0 p-8 sm:p-10 flex flex-col justify-end text-white">
+                  <span className="text-xs uppercase tracking-widest text-luxury-gold font-bold mb-2">
+                    {CATEGORIES[1].itemCount}
+                  </span>
+                  <h3 className="font-serif text-2xl sm:text-3xl font-bold mb-2">
+                    {CATEGORIES[1].name}
+                  </h3>
+                  <p className="text-sm text-slate-300 mb-6 font-light">
+                    {CATEGORIES[1].subtitle}
+                  </p>
+
+                  <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-luxury-gold group-hover:text-white transition-colors bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 w-fit">
+                    <span>Khám phá tủ đồ thuê</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                  </div>
+                </div>
+              </Link>
+            </Card3D>
           </motion.div>
 
           {/* Row 2: 3 Cards (Col-span 4 each) */}
@@ -184,34 +189,36 @@ export function CategoryGrid() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 * index }}
-              className="sm:col-span-1 lg:col-span-4 h-[280px] sm:h-[320px] relative rounded-3xl overflow-hidden group shadow-md border border-slate-100"
+              className="sm:col-span-1 lg:col-span-4 h-[280px] sm:h-[320px] relative rounded-3xl"
             >
-              <Link href={cat.link} className="block w-full h-full relative">
-                <Image
-                  src={cat.image}
-                  alt={cat.name}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 33vw"
-                  className="object-cover transition-transform duration-700 ease-luxury group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+              <Card3D maxRotate={8} glareOpacity={0.2} borderGlow={true} className="rounded-3xl overflow-hidden shadow-md border border-slate-100">
+                <Link href={cat.link} className="block w-full h-full relative group">
+                  <Image
+                    src={cat.image}
+                    alt={cat.name}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-700 ease-luxury group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
 
-                <div className="absolute inset-0 p-6 sm:p-8 flex flex-col justify-end text-white">
-                  <span className="text-[11px] uppercase tracking-wider text-luxury-gold font-semibold mb-1">
-                    {cat.itemCount}
-                  </span>
-                  <h3 className="font-serif text-xl sm:text-2xl font-bold mb-1">
-                    {cat.name}
-                  </h3>
-                  <p className="text-xs text-slate-300 font-light mb-4 line-clamp-1">
-                    {cat.subtitle}
-                  </p>
-                  <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-luxury-gold group-hover:text-white transition-colors">
-                    <span>Xem ngay</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  <div className="absolute inset-0 p-6 sm:p-8 flex flex-col justify-end text-white">
+                    <span className="text-[11px] uppercase tracking-wider text-luxury-gold font-semibold mb-1">
+                      {cat.itemCount}
+                    </span>
+                    <h3 className="font-serif text-xl sm:text-2xl font-bold mb-1">
+                      {cat.name}
+                    </h3>
+                    <p className="text-xs text-slate-300 font-light mb-4 line-clamp-1">
+                      {cat.subtitle}
+                    </p>
+                    <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-luxury-gold group-hover:text-white transition-colors">
+                      <span>Xem ngay</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </Card3D>
             </motion.div>
           ))}
         </div>
