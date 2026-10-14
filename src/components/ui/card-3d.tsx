@@ -101,7 +101,10 @@ export function Card3D({
         } ${className}`}
       >
         {/* Render child elements */}
-        <div style={{ transform: 'translateZ(0px)', transformStyle: 'preserve-3d' }}>
+        <div
+          className="relative w-full h-full"
+          style={{ transform: 'translateZ(0px)', transformStyle: 'preserve-3d' }}
+        >
           {children}
         </div>
 

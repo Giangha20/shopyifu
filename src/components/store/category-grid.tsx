@@ -103,18 +103,20 @@ export function CategoryGrid() {
             transition={{ duration: 0.5 }}
             className="sm:col-span-2 lg:col-span-7 h-[340px] sm:h-[440px] lg:h-[520px] relative rounded-3xl"
           >
-            <Card3D maxRotate={7} glareOpacity={0.2} borderGlow={true} className="rounded-3xl overflow-hidden shadow-lg border border-slate-100">
+            <Card3D maxRotate={7} glareOpacity={0.2} borderGlow={true} className="rounded-3xl overflow-hidden shadow-lg border border-slate-800 bg-neutral-900">
               <Link href={CATEGORIES[0].link} className="block w-full h-full relative group">
                 <Image
                   src={CATEGORIES[0].image}
                   alt={CATEGORIES[0].name}
                   fill
+                  priority
+                  unoptimized
                   sizes="(max-width: 1024px) 100vw, 60vw"
                   className="object-cover transition-transform duration-700 ease-luxury group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none" />
 
-                <div className="absolute inset-0 p-6 sm:p-10 flex flex-col justify-end text-white">
+                <div className="absolute inset-0 p-6 sm:p-10 flex flex-col justify-end text-white z-10 pointer-events-none">
                   <span className="text-xs uppercase tracking-widest text-luxury-gold font-semibold mb-1.5">
                     {CATEGORIES[0].itemCount}
                   </span>
@@ -142,16 +144,18 @@ export function CategoryGrid() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="sm:col-span-2 lg:col-span-5 h-[340px] sm:h-[440px] lg:h-[520px] relative rounded-3xl"
           >
-            <Card3D maxRotate={9} glareOpacity={0.3} borderGlow={true} className="rounded-3xl overflow-hidden shadow-lg border-2 border-luxury-gold/50">
+            <Card3D maxRotate={9} glareOpacity={0.3} borderGlow={true} className="rounded-3xl overflow-hidden shadow-lg border-2 border-luxury-gold/50 bg-neutral-900">
               <Link href={CATEGORIES[1].link} className="block w-full h-full relative group">
                 <Image
                   src={CATEGORIES[1].image}
                   alt={CATEGORIES[1].name}
                   fill
+                  priority
+                  unoptimized
                   sizes="(max-width: 1024px) 100vw, 40vw"
                   className="object-cover transition-transform duration-700 ease-luxury group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
 
                 {/* Special Tag */}
                 <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-10">
@@ -161,7 +165,7 @@ export function CategoryGrid() {
                   </span>
                 </div>
 
-                <div className="absolute inset-0 p-6 sm:p-10 flex flex-col justify-end text-white">
+                <div className="absolute inset-0 p-6 sm:p-10 flex flex-col justify-end text-white z-10 pointer-events-none">
                   <span className="text-xs uppercase tracking-widest text-luxury-gold font-bold mb-1.5">
                     {CATEGORIES[1].itemCount}
                   </span>
@@ -191,18 +195,19 @@ export function CategoryGrid() {
               transition={{ duration: 0.5, delay: 0.1 * index }}
               className="sm:col-span-1 lg:col-span-4 h-[230px] sm:h-[280px] lg:h-[320px] relative rounded-3xl"
             >
-              <Card3D maxRotate={8} glareOpacity={0.2} borderGlow={true} className="rounded-3xl overflow-hidden shadow-md border border-slate-100">
+              <Card3D maxRotate={8} glareOpacity={0.2} borderGlow={true} className="rounded-3xl overflow-hidden shadow-md border border-slate-800 bg-neutral-900">
                 <Link href={cat.link} className="block w-full h-full relative group">
                   <Image
                     src={cat.image}
                     alt={cat.name}
                     fill
+                    unoptimized
                     sizes="(max-width: 1024px) 100vw, 33vw"
                     className="object-cover transition-transform duration-700 ease-luxury group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
 
-                  <div className="absolute inset-0 p-6 sm:p-8 flex flex-col justify-end text-white">
+                  <div className="absolute inset-0 p-6 sm:p-8 flex flex-col justify-end text-white z-10 pointer-events-none">
                     <span className="text-[11px] uppercase tracking-wider text-luxury-gold font-semibold mb-1">
                       {cat.itemCount}
                     </span>
