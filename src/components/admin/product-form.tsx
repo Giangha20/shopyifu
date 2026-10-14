@@ -89,11 +89,19 @@ export function ProductForm({ initialData, productId }: ProductFormProps) {
       },
     ]
   );
-  // Variants
+  // Variants (Size & Color)
   const [variants, setVariants] = useState<any[]>(
-    initialData?.variants || [
-      { name: 'Đen - S', sku: `${sku || 'LX'}-BLK-S`, price: '', quantity: 5, color: 'Đen', size: 'S' },
-      { name: 'Đen - M', sku: `${sku || 'LX'}-BLK-M`, price: '', quantity: 5, color: 'Đen', size: 'M' },
+    initialData?.variants?.map((v: any) => ({
+      ...v,
+      size: v.size || '',
+      color: v.color || '',
+      price: v.price ? String(v.price) : '',
+      quantity: v.quantity !== undefined ? v.quantity : 5,
+    })) || [
+      { name: 'Size S', sku: `${sku || 'LX'}-S`, price: '', quantity: 5, color: '', size: 'S' },
+      { name: 'Size M', sku: `${sku || 'LX'}-M`, price: '', quantity: 5, color: '', size: 'M' },
+      { name: 'Size L', sku: `${sku || 'LX'}-L`, price: '', quantity: 5, color: '', size: 'L' },
+      { name: 'Size XL', sku: `${sku || 'LX'}-XL`, price: '', quantity: 5, color: '', size: 'XL' },
     ]
   );
 
@@ -193,14 +201,59 @@ export function ProductForm({ initialData, productId }: ProductFormProps) {
     setVariants([
       ...variants,
       {
-        name: 'Mới',
+        name: `Phiên bản ${variants.length + 1}`,
         sku: `${sku || 'LX'}-${variants.length + 1}`,
-        price: price || 0,
-        quantity: 1,
+        price: '',
+        quantity: 5,
         color: '',
         size: '',
       },
     ]);
+  };
+
+  const handleAddSizeVariant = (sizeName: string) => {
+    const existing = variants.find((v) => (v.size || '').toUpperCase() === sizeName.toUpperCase());
+    if (existing) {
+      alert(`Size ${sizeName} đã có trong danh sách!`);
+      return;
+    }
+    const cleanSku = (sku || 'LX').trim().toUpperCase();
+    const newVariant = {
+      name: `Size ${sizeName}`,
+      sku: `${cleanSku}-${sizeName}`,
+      price: '',
+      quantity: 5,
+      color: '',
+      size: sizeName,
+    };
+    setVariants((prev) => [...prev, newVariant]);
+  };
+
+  const handleAddStandardSizeSet = (sizeList: string[]) => {
+    const cleanSku = (sku || 'LX').trim().toUpperCase();
+    const existingSizes = new Set(variants.map((v) => (v.size || '').toUpperCase()));
+    const toAdd = sizeList
+      .filter((s) => !existingSizes.has(s.toUpperCase()))
+      .map((s) => ({
+        name: `Size ${s}`,
+        sku: `${cleanSku}-${s}`,
+        price: '',
+        quantity: 5,
+        color: '',
+        size: s,
+      }));
+
+    if (toAdd.length === 0) {
+      alert('Tất cả các size trong bộ này đều đã có trong danh sách!');
+      return;
+    }
+
+    setVariants((prev) => [...prev, ...toAdd]);
+  };
+
+  const handleSyncTotalQuantity = () => {
+    const total = variants.reduce((acc, v) => acc + (Number(v.quantity) || 0), 0);
+    setQuantity(String(total));
   };
 
   const handleRemoveVariant = (index: number) => {
@@ -242,8 +295,10 @@ export function ProductForm({ initialData, productId }: ProductFormProps) {
         images,
         variants: variants.map((v: any, idx: number) => ({
           ...v,
-          name: v.name?.trim() || `Phiên bản ${idx + 1}`,
-          sku: v.sku?.trim() || `${sku.trim()}-${idx + 1}`,
+          size: v.size?.trim() || null,
+          color: v.color?.trim() || null,
+          name: v.name?.trim() || (v.size ? `Size ${v.size.trim()}` : `Phiên bản ${idx + 1}`),
+          sku: v.sku?.trim() || `${sku.trim()}-${v.size ? v.size.trim().toUpperCase() : idx + 1}`,
           price: v.price !== '' && v.price !== null && v.price !== undefined ? Number(v.price) : null,
           quantity: Number(v.quantity) || 0,
         })),
@@ -642,65 +697,258 @@ export function ProductForm({ initialData, productId }: ProductFormProps) {
             </div>
           </div>
 
-          {/* Section 4: Variants */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h2 className="text-base font-bold text-slate-900">Biến thể (Màu sắc / Size)</h2>
-              <Button type="button" onClick={handleAddVariant} variant="outline" size="sm">
-                <Plus className="mr-1 h-3.5 w-3.5" />
-                Thêm biến thể
-              </Button>
+          {/* Section 4: Variants & Size Quần Áo */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-3">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <span>Quản Lý Size & Màu Sắc Quần Áo</span>
+                  <span className="rounded-full bg-luxury-gold/15 px-2.5 py-0.5 text-2xs font-bold text-luxury-gold">
+                    {variants.length} Size / Biến thể
+                  </span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Thiết lập đầy đủ các kích cỡ (XS, S, M, L, XL, 2XL...), màu sắc và số lượng tồn kho từng size
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  type="button"
+                  onClick={() => handleAddStandardSizeSet(['S', 'M', 'L', 'XL'])}
+                  variant="outline"
+                  size="sm"
+                  className="border-luxury-gold/60 text-luxury-gold hover:bg-luxury-gold/10 text-xs font-semibold"
+                >
+                  ⚡ Tạo nhanh đủ Size (S, M, L, XL)
+                </Button>
+                <Button type="button" onClick={handleAddVariant} variant="outline" size="sm">
+                  <Plus className="mr-1 h-3.5 w-3.5" />
+                  Thêm dòng mới
+                </Button>
+              </div>
             </div>
 
-            <div className="space-y-3">
-              {variants.map((v, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-col gap-2 rounded-xl border border-slate-100 bg-slate-50/50 p-3 sm:flex-row sm:items-center"
+            {/* Quick Size Pills */}
+            <div className="rounded-xl bg-slate-50 p-4 border border-slate-200/60 space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-bold text-slate-700 mr-1">Chạm thêm nhanh Size áo/váy:</span>
+                {['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', 'Freesize'].map((sz) => {
+                  const hasSize = variants.some((v) => (v.size || '').toUpperCase() === sz.toUpperCase());
+                  return (
+                    <button
+                      key={sz}
+                      type="button"
+                      onClick={() => handleAddSizeVariant(sz)}
+                      disabled={hasSize}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                        hasSize
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 opacity-60 cursor-not-allowed'
+                          : 'bg-white hover:bg-luxury-gold hover:text-white text-slate-800 border border-slate-300 hover:border-luxury-gold shadow-sm active:scale-95'
+                      }`}
+                    >
+                      {hasSize ? `✓ Size ${sz}` : `+ Size ${sz}`}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200/60">
+                <span className="text-xs font-bold text-slate-700 mr-1">Size quần / Quần tây:</span>
+                {['28', '29', '30', '31', '32', '33', '34'].map((sz) => {
+                  const hasSize = variants.some((v) => (v.size || '').toUpperCase() === sz.toUpperCase());
+                  return (
+                    <button
+                      key={sz}
+                      type="button"
+                      onClick={() => handleAddSizeVariant(sz)}
+                      disabled={hasSize}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                        hasSize
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 opacity-60 cursor-not-allowed'
+                          : 'bg-white hover:bg-slate-900 hover:text-white text-slate-700 border border-slate-200 shadow-sm active:scale-95'
+                      }`}
+                    >
+                      {hasSize ? `✓ ${sz}` : `+ ${sz}`}
+                    </button>
+                  );
+                })}
+                <span className="text-slate-300 mx-1">|</span>
+                <button
+                  type="button"
+                  onClick={() => handleAddStandardSizeSet(['XS', 'S', 'M', 'L', 'XL', '2XL'])}
+                  className="text-xs text-luxury-gold font-semibold hover:underline"
                 >
-                  <input
-                    type="text"
-                    placeholder="Tên (VD: Đen - XL)"
-                    value={v.name}
-                    onChange={(e) => {
-                      const updated = [...variants];
-                      updated[idx].name = e.target.value;
-                      setVariants(updated);
-                    }}
-                    className="h-9 flex-1 rounded border border-slate-300 px-2.5 text-xs focus:outline-none"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Mã SKU"
-                    value={v.sku}
-                    onChange={(e) => {
-                      const updated = [...variants];
-                      updated[idx].sku = e.target.value;
-                      setVariants(updated);
-                    }}
-                    className="h-9 w-32 rounded border border-slate-300 px-2.5 text-xs font-mono focus:outline-none"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Số lượng"
-                    value={v.quantity}
-                    onChange={(e) => {
-                      const updated = [...variants];
-                      updated[idx].quantity = Number(e.target.value);
-                      setVariants(updated);
-                    }}
-                    className="h-9 w-20 rounded border border-slate-300 px-2.5 text-xs focus:outline-none"
-                  />
+                  + Thêm cả bộ (XS - 2XL)
+                </button>
+              </div>
+            </div>
+
+            {/* Variants table */}
+            {variants.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-slate-300 py-8 text-center bg-slate-50/50">
+                <p className="text-xs text-slate-500 font-medium">Chưa có size/biến thể nào được tạo.</p>
+                <p className="text-[11px] text-slate-400 mt-1">Bấm các nút phía trên để tự động tạo nhanh đủ bộ size cho sản phẩm này.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="hidden sm:grid sm:grid-cols-12 gap-3 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  <div className="col-span-2">Size quần áo *</div>
+                  <div className="col-span-2">Màu sắc (Tùy chọn)</div>
+                  <div className="col-span-3">Tên hiển thị biến thể</div>
+                  <div className="col-span-2">Mã SKU riêng</div>
+                  <div className="col-span-1 text-center">Số lượng</div>
+                  <div className="col-span-1 text-right">Giá riêng</div>
+                  <div className="col-span-1 text-center">Xóa</div>
+                </div>
+
+                {variants.map((v, idx) => (
+                  <div
+                    key={idx}
+                    className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 rounded-xl border border-slate-200 bg-white p-3 hover:border-luxury-gold/50 transition-colors items-center shadow-xs"
+                  >
+                    {/* Size selector / input */}
+                    <div className="sm:col-span-2 space-y-1">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase sm:hidden">Size quần áo *</span>
+                      <input
+                        type="text"
+                        placeholder="Size (S, M, L...)"
+                        value={v.size || ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const updated = [...variants];
+                          updated[idx].size = val;
+                          if (!updated[idx].name || updated[idx].name.startsWith('Size ') || updated[idx].name.startsWith('Phiên bản ') || updated[idx].name === 'Mới') {
+                            updated[idx].name = val ? `${updated[idx].color ? updated[idx].color + ' - ' : ''}Size ${val}` : '';
+                          }
+                          if (!updated[idx].sku || updated[idx].sku.startsWith(`${sku || 'LX'}-`)) {
+                            updated[idx].sku = `${sku || 'LX'}-${val ? val.toUpperCase() : idx + 1}`;
+                          }
+                          setVariants(updated);
+                        }}
+                        className="h-9 w-full rounded-lg border border-slate-300 px-2.5 text-xs font-bold text-luxury-black focus:border-luxury-gold focus:outline-none"
+                      />
+                    </div>
+
+                    {/* Color */}
+                    <div className="sm:col-span-2 space-y-1">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase sm:hidden">Màu sắc</span>
+                      <input
+                        type="text"
+                        placeholder="Màu (Trắng, Đen...)"
+                        value={v.color || ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const updated = [...variants];
+                          updated[idx].color = val;
+                          if (val && updated[idx].size) {
+                            updated[idx].name = `${val} - Size ${updated[idx].size}`;
+                          }
+                          setVariants(updated);
+                        }}
+                        className="h-9 w-full rounded-lg border border-slate-300 px-2.5 text-xs focus:border-luxury-gold focus:outline-none"
+                      />
+                    </div>
+
+                    {/* Variant Name */}
+                    <div className="sm:col-span-3 space-y-1">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase sm:hidden">Tên hiển thị</span>
+                      <input
+                        type="text"
+                        placeholder="Tên (VD: Đen - Size M)"
+                        value={v.name || ''}
+                        onChange={(e) => {
+                          const updated = [...variants];
+                          updated[idx].name = e.target.value;
+                          setVariants(updated);
+                        }}
+                        className="h-9 w-full rounded-lg border border-slate-300 px-2.5 text-xs focus:border-luxury-gold focus:outline-none"
+                      />
+                    </div>
+
+                    {/* SKU */}
+                    <div className="sm:col-span-2 space-y-1">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase sm:hidden">SKU</span>
+                      <input
+                        type="text"
+                        placeholder="Mã SKU"
+                        value={v.sku || ''}
+                        onChange={(e) => {
+                          const updated = [...variants];
+                          updated[idx].sku = e.target.value;
+                          setVariants(updated);
+                        }}
+                        className="h-9 w-full rounded-lg border border-slate-300 px-2.5 text-xs font-mono text-slate-700 focus:border-luxury-gold focus:outline-none"
+                      />
+                    </div>
+
+                    {/* Quantity */}
+                    <div className="sm:col-span-1 space-y-1">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase sm:hidden">SL tồn</span>
+                      <input
+                        type="number"
+                        min="0"
+                        placeholder="Số lượng"
+                        value={v.quantity !== undefined ? v.quantity : 0}
+                        onChange={(e) => {
+                          const updated = [...variants];
+                          updated[idx].quantity = Math.max(0, parseInt(e.target.value) || 0);
+                          setVariants(updated);
+                        }}
+                        className="h-9 w-full rounded-lg border border-slate-300 px-2 text-center text-xs font-semibold focus:border-luxury-gold focus:outline-none"
+                      />
+                    </div>
+
+                    {/* Price override */}
+                    <div className="sm:col-span-1 space-y-1">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase sm:hidden">Giá riêng</span>
+                      <input
+                        type="number"
+                        min="0"
+                        placeholder="Gốc"
+                        value={v.price || ''}
+                        onChange={(e) => {
+                          const updated = [...variants];
+                          updated[idx].price = e.target.value;
+                          setVariants(updated);
+                        }}
+                        className="h-9 w-full rounded-lg border border-slate-300 px-2 text-right text-xs focus:border-luxury-gold focus:outline-none"
+                        title="Để trống sẽ tự lấy giá bán gốc"
+                      />
+                    </div>
+
+                    {/* Delete button */}
+                    <div className="sm:col-span-1 flex justify-center pt-2 sm:pt-0">
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveVariant(idx)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                        title="Xóa size này"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Bottom sync bar */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 px-2 border-t border-slate-100 text-xs text-slate-500">
+                  <div className="flex items-center gap-2">
+                    <span>Tổng tồn kho từ các size:</span>
+                    <strong className="text-slate-900 font-bold">
+                      {variants.reduce((acc, v) => acc + (Number(v.quantity) || 0), 0)} sản phẩm
+                    </strong>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => handleRemoveVariant(idx)}
-                    className="p-1.5 text-slate-400 hover:text-rose-600"
+                    onClick={handleSyncTotalQuantity}
+                    className="inline-flex items-center gap-1.5 text-luxury-gold hover:text-luxury-black font-semibold transition-colors"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <span>↺ Cập nhật số này vào Tổng kho sản phẩm</span>
                   </button>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 

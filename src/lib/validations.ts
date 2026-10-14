@@ -115,8 +115,8 @@ export const productVariantSchema = z.object({
   sku: z.string().min(1, 'Vui lòng nhập mã SKU'),
   price: z.number().min(0).optional().nullable(),
   quantity: z.number().int().min(0),
-  color: z.string().optional(),
-  size: z.string().optional(),
+  color: z.string().optional().nullable(),
+  size: z.string().optional().nullable(),
   isActive: z.boolean().optional(),
 });
 
