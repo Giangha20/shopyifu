@@ -408,7 +408,7 @@ export function VirtualShowroom3D() {
             <div className="space-y-3">
               <h4 className="text-xs uppercase font-bold tracking-[0.2em] text-slate-300 flex items-center gap-2">
                 <Scissors className="w-3.5 h-3.5 text-luxury-gold" />
-                <span>Ghi chú từ Xưởng may Atelier YIFU:</span>
+                <span>Ghi chú từ Xưởng may Atelier SHOP QUAN AO:</span>
               </h4>
               <p className="text-sm text-slate-300 leading-relaxed italic bg-white/[0.02] p-4 rounded-xl border border-white/5">
                 &ldquo;{currentItem.atelierNote}&rdquo;

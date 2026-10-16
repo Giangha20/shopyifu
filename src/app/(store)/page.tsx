@@ -30,6 +30,9 @@ import { CategoryGrid } from '@/components/store/category-grid';
 import { ProductCard, type ProductItem } from '@/components/store/product-card';
 import { TrustBadges } from '@/components/store/trust-badges';
 import { NewsletterSection } from '@/components/store/newsletter-section';
+import { VirtualShowroom3D } from '@/components/store/virtual-showroom-3d';
+import { VIPHologramCardSection } from '@/components/store/vip-hologram-card';
+import { Card3D } from '@/components/ui/card-3d';
 import { SAMPLE_PRODUCTS } from '@/lib/sample-data';
 
 // Curated Luxury Products for "Sản Phẩm Mới" (New Arrivals)
@@ -480,7 +483,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {RENTAL_HIGHLIGHTS.map((item) => (
               <div key={item.id} className="h-full">
-                <div className="rounded-3xl overflow-hidden bg-white/5 border border-white/10 hover:border-luxury-gold/60 transition-all hover:scale-[1.02] duration-300 shadow-lg h-full">
+                <Card3D maxRotate={10} glareOpacity={0.25} borderGlow={true} className="rounded-3xl overflow-hidden bg-white/5 border border-white/10 hover:border-luxury-gold/60 transition-colors">
                   <div className="group relative flex flex-col h-full">
                     {/* Image */}
                     <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-900">
@@ -545,7 +548,7 @@ export default function HomePage() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </Card3D>
               </div>
             ))}
           </div>
@@ -860,7 +863,7 @@ export default function HomePage() {
                   href="/about"
                   className="btn-primary py-3 px-7 rounded-xl inline-flex items-center gap-2"
                 >
-                  <span>Tìm hiểu thêm về LUXE SHOP</span>
+                  <span>Tìm hiểu thêm về SHOP QUAN AO</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -869,6 +872,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 8. 3D INTERACTIVE VIRTUAL SHOWROOM STAGE */}
+      <VirtualShowroom3D />
+
+      {/* 9. 3D HOLOGRAPHIC VIP PRIVILEGE BLACK CARD */}
+      <VIPHologramCardSection />
 
       {/* 10. CUSTOMER REVIEWS (TESTIMONIALS) */}
       <section className="py-20 sm:py-24 bg-white">

@@ -24,14 +24,14 @@ export function VIPHologramCardSection() {
 
   const handleActivateVIP = () => {
     setActivated(true);
-    toast.success('Chúc mừng quý khách đã mở khoá Đặc Quyền YIFU VIP Black Card! 👑');
+    toast.success('Chúc mừng quý khách đã mở khoá Đặc Quyền VIP Black Card! 👑');
   };
 
   const handleCopyVipCode = () => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText('YIFU-VIP-BLACK');
+      navigator.clipboard.writeText('SHOP-VIP-BLACK');
       setVipCodeCopied(true);
-      toast.success('Đã sao chép mã đặc quyền: YIFU-VIP-BLACK (Giảm 15% trọn đời)!');
+      toast.success('Đã sao chép mã đặc quyền: SHOP-VIP-BLACK (Giảm 15% trọn đời)!');
       setTimeout(() => setVipCodeCopied(false), 3000);
     }
   };
@@ -54,7 +54,7 @@ export function VIPHologramCardSection() {
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
               Thẻ Đen Quyền Lực{' '}
               <span className="text-gold-gradient block sm:inline">
-                YIFU VIP Black Card
+                SHOP QUAN AO VIP Black Card
               </span>
             </h2>
 
@@ -174,7 +174,7 @@ export function VIPHologramCardSection() {
                       </div>
                       <div>
                         <span className="font-serif font-bold text-xs sm:text-sm tracking-[0.15em] text-gold-gradient block">
-                          YIFU ATELIER
+                          SHOP QUAN AO ATELIER
                         </span>
                         <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-slate-400">
                           HAUTE COUTURE VIP
@@ -230,7 +230,7 @@ export function VIPHologramCardSection() {
             </div>
 
             <p className="text-[11px] text-slate-500 mt-4 text-center italic">
-              Được bảo chứng bởi YIFU Maison &bull; Giấy phép phục vụ VIP Concierge số 08/2026/YIFU-VIP
+              Được bảo chứng bởi SHOP QUAN AO &bull; Giấy phép phục vụ VIP Concierge số 08/2026/VIP
             </p>
           </div>
         </div>

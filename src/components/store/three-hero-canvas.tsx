@@ -151,11 +151,14 @@ export function ThreeHeroCanvas() {
 
       window.addEventListener('resize', handleResize);
 
-      // 9. Animation Loop
+      // 9. Animation Loop with IntersectionObserver & Page Visibility Pause
       let clock = new THREE.Clock();
+      let isVisible = true;
 
       const animate = () => {
         animId = requestAnimationFrame(animate);
+        if (!isVisible || document.hidden) return;
+
         const elapsedTime = clock.getElapsedTime();
 
         // Idle floating & rotation
@@ -182,11 +185,23 @@ export function ThreeHeroCanvas() {
         }
       };
 
+      // Intersection Observer to stop loop when scrolled out of view
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            isVisible = entry.isIntersecting;
+          });
+        },
+        { threshold: 0.05 }
+      );
+      observer.observe(container);
+
       animate();
 
       // Cleanup
       return () => {
         cancelAnimationFrame(animId);
+        observer.disconnect();
         window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('resize', handleResize);
 
@@ -219,7 +234,7 @@ export function ThreeHeroCanvas() {
     >
       {hasWebGL === false && (
         <div className="text-luxury-gold/40 text-xs italic">
-          [YIFU Haute Couture 3D Showcase]
+          [SHOP QUAN AO 3D Showcase]
         </div>
       )}
     </div>
