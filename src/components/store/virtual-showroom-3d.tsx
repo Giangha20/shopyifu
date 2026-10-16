@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -171,8 +171,18 @@ export function VirtualShowroom3D() {
   const [selectedItemIndex, setSelectedItemIndex] = useState(0);
   const [currentAngleIndex, setCurrentAngleIndex] = useState(0);
   const [activeHotspot, setActiveHotspot] = useState<number | null>(null);
+  const [autoRotate, setAutoRotate] = useState(true);
 
   const currentItem = SHOWROOM_ITEMS[selectedItemIndex];
+
+  // Tự động xoay góc nhìn 3D tuần hoàn không phụ thuộc vào chuột
+  useEffect(() => {
+    if (!autoRotate) return;
+    const interval = setInterval(() => {
+      setCurrentAngleIndex((prev) => (prev + 1) % currentItem.angles.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [autoRotate, currentItem.angles.length]);
 
   return (
     <section className="py-24 sm:py-32 bg-[#0E0E10] text-white relative overflow-hidden border-t border-luxury-gold/20">
@@ -231,7 +241,7 @@ export function VirtualShowroom3D() {
           <div className="lg:col-span-7 relative flex flex-col items-center">
             {/* 3D Perspective Card Container */}
             <div className="w-full max-w-[540px] aspect-[4/5] relative">
-              <Card3D maxRotate={14} glareOpacity={0.25} borderGlow={true} className="rounded-3xl">
+              <Card3D maxRotate={0} glareOpacity={0.12} borderGlow={true} className="rounded-3xl">
                 <div className="relative w-full h-full rounded-3xl overflow-hidden bg-gradient-to-b from-neutral-900/90 via-black to-neutral-950 border border-luxury-gold/30 shadow-2xl flex items-center justify-center">
                   {/* Backdrop Light Cone */}
                   <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-luxury-gold/25 via-transparent to-transparent pointer-events-none" />
@@ -343,17 +353,20 @@ export function VirtualShowroom3D() {
             </div>
 
             {/* Angle Switcher Controls under the Stage */}
-            <div className="mt-4 sm:mt-6 flex flex-wrap items-center justify-center gap-2 bg-white/[0.04] p-2 sm:p-2.5 rounded-2xl border border-white/10 w-full max-w-[540px]">
-              <span className="text-xs text-slate-400 font-medium px-2 flex items-center gap-1.5 shrink-0">
-                <RotateCw className="w-3.5 h-3.5 text-luxury-gold" />
-                <span className="hidden sm:inline">Góc xoay:</span>
-              </span>
+            <div className="mt-4 sm:mt-6 flex flex-wrap items-center justify-between gap-2 bg-white/[0.04] p-2 sm:p-2.5 rounded-2xl border border-white/10 w-full max-w-[540px]">
               <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                <span className="text-xs text-slate-400 font-medium px-2 flex items-center gap-1.5 shrink-0">
+                  <RotateCw className="w-3.5 h-3.5 text-luxury-gold" />
+                  <span className="hidden sm:inline">Góc xoay:</span>
+                </span>
                 {currentItem.angles.map((ang, aIdx) => (
                   <button
                     key={aIdx}
                     type="button"
-                    onClick={() => setCurrentAngleIndex(aIdx)}
+                    onClick={() => {
+                      setCurrentAngleIndex(aIdx);
+                      setAutoRotate(false);
+                    }}
                     className={`px-3 py-1.5 rounded-xl text-2xs sm:text-xs font-semibold tracking-wider transition-all min-h-[34px] ${
                       currentAngleIndex === aIdx
                         ? 'bg-luxury-gold text-black shadow-gold font-bold'
@@ -364,6 +377,20 @@ export function VirtualShowroom3D() {
                   </button>
                 ))}
               </div>
+
+              <button
+                type="button"
+                onClick={() => setAutoRotate(!autoRotate)}
+                className={`px-3 py-1.5 rounded-xl text-2xs font-semibold tracking-wider border transition-all flex items-center gap-1.5 min-h-[34px] ${
+                  autoRotate
+                    ? 'border-luxury-gold/50 text-luxury-gold bg-luxury-gold/10'
+                    : 'border-white/10 text-slate-400 hover:text-white'
+                }`}
+                title="Bật/Tắt tự động xoay góc nhìn 3D"
+              >
+                <RotateCw className={`w-3 h-3 ${autoRotate ? 'animate-spin-slow text-luxury-gold' : ''}`} />
+                <span>{autoRotate ? 'Tự do xoay: BẬT' : 'Tự do xoay: TẮT'}</span>
+              </button>
             </div>
           </div>
 

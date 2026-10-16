@@ -123,24 +123,7 @@ export function ThreeHeroCanvas() {
       const particles = new THREE.Points(particleGeo, particleMat);
       scene.add(particles);
 
-      // 7. Interactive Mouse Tracking
-      let mouseX = 0;
-      let mouseY = 0;
-      let targetRotationX = 0;
-      let targetRotationY = 0;
-
-      const onPointerMove = (e: MouseEvent) => {
-        const { innerWidth, innerHeight } = window;
-        mouseX = (e.clientX / innerWidth) * 2 - 1;
-        mouseY = -(e.clientY / innerHeight) * 2 + 1;
-
-        targetRotationY = mouseX * 0.75;
-        targetRotationX = -mouseY * 0.5;
-      };
-
-      window.addEventListener('pointermove', onPointerMove, { passive: true });
-
-      // 8. Resize Handler
+      // 7. Resize Handler
       const handleResize = () => {
         if (!container || !renderer) return;
         const w = container.clientWidth;
@@ -152,7 +135,7 @@ export function ThreeHeroCanvas() {
 
       window.addEventListener('resize', handleResize);
 
-      // 9. Animation Loop with IntersectionObserver & Page Visibility Pause
+      // 8. Animation Loop with Free 360° Continuous Rotation (Tự do xoay tròn, không theo chuột)
       let clock = new THREE.Clock();
       let isVisible = true;
 
@@ -162,24 +145,25 @@ export function ThreeHeroCanvas() {
 
         const elapsedTime = clock.getElapsedTime();
 
-        // Idle floating & rotation
-        jewelMesh.rotation.y = elapsedTime * 0.22;
-        jewelMesh.rotation.x = Math.sin(elapsedTime * 0.3) * 0.2;
+        // Quay tự do không theo chuột (Tự động xoay tròn 360 độ liên tục)
+        jewelGroup.rotation.y = elapsedTime * 0.42; // Tự do xoay quanh trục đứng
+        jewelGroup.rotation.x = Math.sin(elapsedTime * 0.35) * 0.2; // Dao động trục ngang 3D mượt mà
+        jewelGroup.rotation.z = Math.cos(elapsedTime * 0.28) * 0.12; // Nghiêng nhẹ tạo độ bồng bềnh
 
-        outerMesh.rotation.y = -elapsedTime * 0.15;
-        outerMesh.rotation.z = Math.cos(elapsedTime * 0.25) * 0.15;
+        // Các lớp tinh thể và vòng nhẫn quay đa hướng tự do
+        jewelMesh.rotation.y = elapsedTime * 0.6;
+        jewelMesh.rotation.x = Math.sin(elapsedTime * 0.45) * 0.25;
 
-        ringMesh.rotation.z = elapsedTime * 0.35;
-        ringMesh.rotation.y = Math.sin(elapsedTime * 0.4) * 0.25;
+        outerMesh.rotation.y = -elapsedTime * 0.32;
+        outerMesh.rotation.z = Math.cos(elapsedTime * 0.38) * 0.18;
 
-        particles.rotation.y = elapsedTime * 0.05;
+        ringMesh.rotation.z = elapsedTime * 0.7;
+        ringMesh.rotation.y = Math.sin(elapsedTime * 0.5) * 0.35;
 
-        // Smooth Lerp tracking to mouse coordinates
-        jewelGroup.rotation.y += (targetRotationY - jewelGroup.rotation.y) * 0.05;
-        jewelGroup.rotation.x += (targetRotationX - jewelGroup.rotation.x) * 0.05;
+        particles.rotation.y = elapsedTime * 0.1;
 
-        // Floating subtle bobbing
-        jewelGroup.position.y = Math.sin(elapsedTime * 1.2) * 0.12;
+        // Floating subtle bobbing (Lơ lửng bồng bềnh không gian)
+        jewelGroup.position.y = Math.sin(elapsedTime * 1.3) * 0.14;
 
         if (renderer) {
           renderer.render(scene, camera);
@@ -203,7 +187,6 @@ export function ThreeHeroCanvas() {
       return () => {
         cancelAnimationFrame(animId);
         observer.disconnect();
-        window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('resize', handleResize);
 
         jewelGeo.dispose();
