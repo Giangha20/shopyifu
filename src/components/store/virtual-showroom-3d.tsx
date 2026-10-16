@@ -179,7 +179,7 @@ export function VirtualShowroom3D() {
       {/* Stage ambient lights & circular stage base */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-luxury-gold/10 rounded-full blur-[140px] pointer-events-none" />
 
-      <div className="container-luxe mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="container-luxe relative z-10">
         {/* Section Header */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-16 gap-6">
           <div>
@@ -232,11 +232,11 @@ export function VirtualShowroom3D() {
             {/* 3D Perspective Card Container */}
             <div className="w-full max-w-[540px] aspect-[4/5] relative">
               <Card3D maxRotate={14} glareOpacity={0.25} borderGlow={true} className="rounded-3xl">
-                <div className="relative w-full h-full rounded-3xl overflow-hidden bg-black/80 border border-luxury-gold/30 shadow-2xl">
+                <div className="relative w-full h-full rounded-3xl overflow-hidden bg-gradient-to-b from-neutral-900/90 via-black to-neutral-950 border border-luxury-gold/30 shadow-2xl flex items-center justify-center">
                   {/* Backdrop Light Cone */}
                   <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-luxury-gold/25 via-transparent to-transparent pointer-events-none" />
 
-                  {/* Main Product Showcase Image */}
+                  {/* Main Product Showcase Image - object-contain prevents any side cropping */}
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={`${currentItem.id}-${currentAngleIndex}`}
@@ -244,15 +244,16 @@ export function VirtualShowroom3D() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 1.04 }}
                       transition={{ duration: 0.4, ease: 'easeOut' }}
-                      className="relative w-full h-full"
+                      className="relative w-full h-full p-2 sm:p-4"
                     >
                       <Image
                         src={currentItem.angles[currentAngleIndex].image}
                         alt={currentItem.name}
                         fill
                         priority
+                        unoptimized
                         sizes="(max-width: 1024px) 100vw, 50vw"
-                        className="object-cover object-center"
+                        className="object-contain object-center"
                       />
                     </motion.div>
                   </AnimatePresence>

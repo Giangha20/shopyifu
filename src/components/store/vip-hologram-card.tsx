@@ -42,7 +42,7 @@ export function VIPHologramCardSection() {
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-luxury-gold/10 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-amber-600/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="container-luxe mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="container-luxe relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Column: Editorial Copywriting */}
           <div className="lg:col-span-6 space-y-6">

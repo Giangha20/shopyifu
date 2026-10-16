@@ -147,7 +147,7 @@ export function HeroBanner() {
             </div>
 
             {/* Interactive 3D WebGL Jewel Showcase */}
-            <div className="hidden lg:flex flex-col items-center justify-center w-[420px] h-[420px] relative pointer-events-auto pr-8">
+            <div className="hidden lg:flex flex-col items-center justify-center w-[440px] h-[440px] relative pointer-events-auto">
               <ThreeHeroCanvas />
               <div className="absolute bottom-2 px-4 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-luxury-gold/40 text-[10px] font-mono tracking-widest text-luxury-gold shadow-gold flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-luxury-gold" />
@@ -269,7 +269,7 @@ export function HeroBanner() {
               </div>
 
               {/* Interactive 3D WebGL Jewel Showcase */}
-              <div className="hidden lg:flex flex-col items-center justify-center w-[420px] h-[420px] relative pointer-events-auto pr-8">
+              <div className="hidden lg:flex flex-col items-center justify-center w-[440px] h-[440px] relative pointer-events-auto">
                 <ThreeHeroCanvas />
                 <div className="absolute bottom-2 px-4 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-luxury-gold/40 text-[10px] font-mono tracking-widest text-luxury-gold shadow-gold flex items-center gap-2">
                   <Sparkles className="w-3.5 h-3.5 text-luxury-gold" />

@@ -22,7 +22,7 @@ export function ThreeHeroCanvas() {
       const width = container.clientWidth || 400;
       const height = container.clientHeight || 400;
       const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-      camera.position.z = 6;
+      camera.position.z = 7.8;
 
       // 3. Renderer setup
       renderer = new THREE.WebGLRenderer({
@@ -96,6 +96,7 @@ export function ThreeHeroCanvas() {
       ringMesh.rotation.x = Math.PI / 3;
       jewelGroup.add(ringMesh);
 
+      jewelGroup.scale.set(0.85, 0.85, 0.85);
       scene.add(jewelGroup);
 
       // 6. Floating Golden Stardust Particles
@@ -104,9 +105,9 @@ export function ThreeHeroCanvas() {
       const positions = new Float32Array(particleCount * 3);
 
       for (let i = 0; i < particleCount * 3; i += 3) {
-        positions[i] = (Math.random() - 0.5) * 12;
-        positions[i + 1] = (Math.random() - 0.5) * 12;
-        positions[i + 2] = (Math.random() - 0.5) * 8;
+        positions[i] = (Math.random() - 0.5) * 6.5;
+        positions[i + 1] = (Math.random() - 0.5) * 6.5;
+        positions[i + 2] = (Math.random() - 0.5) * 4.5;
       }
 
       particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
