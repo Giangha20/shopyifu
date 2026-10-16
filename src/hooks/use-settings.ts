@@ -20,11 +20,11 @@ export interface StoreSettings {
 }
 
 const defaultSettings: StoreSettings = {
-  storeName: 'LUXE SHOP',
-  storeSlogan: 'Thời Trang Cao Cấp & Đẳng Cấp Thượng Lưu',
-  contactEmail: 'contact@luxeshop.vn',
-  contactPhone: '1900 8888',
-  contactAddress: 'Toà nhà Landmark 81, 720A Điện Biên Phủ, Phường 22, Bình Thạnh, TP. Hồ Chí Minh',
+  storeName: 'SHOP QUAN AO',
+  storeSlogan: 'Thời Trang Cao Cấp & Đẳng Cấp Phong Cách',
+  contactEmail: 'contact@shopquanao.vn',
+  contactPhone: '0901 234 567',
+  contactAddress: '123 Đường Thời Trang, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
   businessHours: '08:30 - 21:30 hàng ngày',
   facebookUrl: 'https://facebook.com',
   instagramUrl: 'https://instagram.com',
@@ -33,7 +33,7 @@ const defaultSettings: StoreSettings = {
   shippingFreeThreshold: 500000,
   bankName: 'MBBank',
   bankAccountNumber: '8888 6666 9999',
-  bankAccountName: 'LUXE SHOP VIET NAM',
+  bankAccountName: 'SHOP QUAN AO',
   paymentQrCode: '',
 };
 

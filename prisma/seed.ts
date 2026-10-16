@@ -155,8 +155,8 @@ async function main() {
   // 2. INITIAL SUPER ADMIN USER
   // ==========================================
   console.log('👤 Seeding Super Admin user...');
-  const adminEmail = (process.env.ADMIN_EMAIL || 'admin@luxeshop.vn').toLowerCase();
-  const adminPassword = process.env.ADMIN_PASSWORD || 'ChangeMeImmediately!2024';
+  const adminEmail = (process.env.ADMIN_EMAIL || 'admin@shopquanao.vn').toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD || 'AdminPassword@2026!';
   const passwordHash = await hash(adminPassword, 12);
 
   const adminUser = await prisma.user.upsert({
@@ -166,13 +166,13 @@ async function main() {
       isActive: true,
       isEmailVerified: true,
       firstName: 'Admin',
-      lastName: 'LUXE',
+      lastName: 'Shop',
     },
     create: {
       email: adminEmail,
       passwordHash,
       firstName: 'Admin',
-      lastName: 'LUXE',
+      lastName: 'Shop',
       phone: '0901234567',
       isActive: true,
       isEmailVerified: true,
@@ -1295,13 +1295,14 @@ Lót trong lụa Bemberg mềm mát chống tích điện, ve áo peak lapel s�
   console.log('⚙️ Seeding store settings...');
 
   const settings = [
-    { key: 'store_name', value: 'LUXE SHOP', group: 'general', label: 'Tên cửa hàng', type: 'string' },
+    { key: 'store_name', value: 'SHOP QUAN AO', group: 'general', label: 'Tên cửa hàng', type: 'string' },
+    { key: 'site_name', value: 'SHOP QUAN AO', group: 'general', label: 'Tên trang web', type: 'string' },
     { key: 'store_description', value: 'Thời trang cao cấp & phong cách sống', group: 'general', label: 'Mô tả cửa hàng', type: 'string' },
-    { key: 'store_email', value: 'contact@luxeshop.vn', group: 'general', label: 'Email liên hệ', type: 'string' },
-    { key: 'store_phone', value: '1900 8888', group: 'general', label: 'Hotline hỗ trợ', type: 'string' },
-    { key: 'store_address', value: '88 Đồng Khởi, Bến Nghé, Quận 1, TP. Hồ Chí Minh', group: 'general', label: 'Địa chỉ cửa hàng', type: 'string' },
-    { key: 'social_facebook', value: 'https://facebook.com/luxeshop.vn', group: 'social', label: 'Trang Facebook', type: 'string' },
-    { key: 'social_instagram', value: 'https://instagram.com/luxeshop.vn', group: 'social', label: 'Trang Instagram', type: 'string' },
+    { key: 'store_email', value: 'contact@shopquanao.vn', group: 'general', label: 'Email liên hệ', type: 'string' },
+    { key: 'store_phone', value: '0901 234 567', group: 'general', label: 'Hotline hỗ trợ', type: 'string' },
+    { key: 'store_address', value: '123 Đường Thời Trang, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh', group: 'general', label: 'Địa chỉ cửa hàng', type: 'string' },
+    { key: 'social_facebook', value: 'https://facebook.com/shopquanao', group: 'social', label: 'Trang Facebook', type: 'string' },
+    { key: 'social_instagram', value: 'https://instagram.com/shopquanao', group: 'social', label: 'Trang Instagram', type: 'string' },
     { key: 'announcement_text', value: '✨ Miễn phí vận chuyển toàn quốc cho đơn hàng từ 500,000₫ | Giao hàng hoả tốc 2H tại TP.HCM', group: 'announcement', label: 'Thanh thông báo đầu trang', type: 'string' },
     { key: 'shipping_free_above', value: '500000', group: 'shipping', label: 'Mức miễn phí vận chuyển', type: 'number' },
     { key: 'currency', value: 'VND', group: 'general', label: 'Đơn vị tiền tệ', type: 'string' },

@@ -1,4 +1,4 @@
-================================================================================
+﻿================================================================================
           HƯỚNG DẪN CÀI ĐẶT & SỬ DỤNG NHANH WEBSITE YIFU SHOP
                 (DÀNH CHO NGƯỜI MỚI BẮT ĐẦU - TỪ A ĐẾN Z)
 ================================================================================
@@ -19,8 +19,8 @@ CÁCH 1: CHẠY THỬ TRÊN MÁY TÍNH TRONG 2 CÚ CLICK CHUỘT
    - Mở trình duyệt web vào:
      + Trang bán hàng: http://localhost:3000
      + Trang quản trị Admin: http://localhost:3000/admin/login
-       * Email Admin: giangshop@gmail.com
-       * Mật khẩu: GiangShop@2026!
+       * Email Admin: admin@shopquanao.vn
+       * Mật khẩu: AdminPassword@2026!
 
 --------------------------------------------------------------------------------
 CÁCH 2: ĐƯA WEBSITE LÊN MẠNG INTERNET 24/7 MIỄN PHÍ (VERCEL + NEON)
@@ -41,8 +41,8 @@ CÁCH 2: ĐƯA WEBSITE LÊN MẠNG INTERNET 24/7 MIỄN PHÍ (VERCEL + NEON)
      * DATABASE_URL = (Dán link Connection String của Neon ở bước 1)
      * NEXTAUTH_SECRET = YIFU_SHOP_SECRET_SECURITY_KEY_2026
      * NEXTAUTH_URL = https://ten-shop-cua-ban.vercel.app
-     * ADMIN_EMAIL = giangshop@gmail.com
-     * ADMIN_PASSWORD = GiangShop@2026!
+     * ADMIN_EMAIL = admin@shopquanao.vn
+     * ADMIN_PASSWORD = AdminPassword@2026!
    - Bấm "Deploy" -> Sau 1-2 phút bạn có ngay link website chạy 24/7!
 
 --------------------------------------------------------------------------------
@@ -80,3 +80,4 @@ THÔNG TIN QUẢN TRỊ & BẢO MẬT QUAN TRỌNG
 
 (Xem thêm chi tiết đầy đủ có hình minh họa tại file: HUONG_DAN_CAI_DAT_CHI_TIET.md)
 ================================================================================
+

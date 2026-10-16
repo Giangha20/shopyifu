@@ -26,11 +26,16 @@ const BADGES = [
   },
 ];
 
-export function TrustBadges() {
+interface TrustBadgesProps {
+  className?: string;
+}
+
+export function TrustBadges({ className = '' }: TrustBadgesProps) {
   return (
-    <section className="border-y border-gray-100 bg-slate-50/60 py-12 sm:py-16">
-      <div className="container-luxe mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+    <section className={`border-y border-gray-100 bg-slate-50/70 py-8 sm:py-14 ${className}`}>
+      <div className="container-luxe mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+        {/* 2 dòng ngang, mỗi dòng 2 mục */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-6">
           {BADGES.map((badge, index) => {
             const Icon = badge.icon;
             return (
@@ -39,17 +44,17 @@ export function TrustBadges() {
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="flex items-start gap-4 p-4 rounded-xl transition-all duration-300 hover:bg-white hover:shadow-sm"
+                transition={{ duration: 0.4, delay: index * 0.08 }}
+                className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-2.5 sm:gap-4 p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-luxury-gold/50 hover:shadow-md transition-all duration-300"
               >
-                <div className="w-12 h-12 rounded-xl bg-luxury-cream flex items-center justify-center shrink-0 border border-luxury-gold/20">
-                  <Icon className="w-6 h-6 text-luxury-gold" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-luxury-cream flex items-center justify-center shrink-0 border border-luxury-gold/25 shadow-xs">
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-luxury-gold" />
                 </div>
-                <div>
-                  <h4 className="font-serif text-base font-bold text-luxury-black">
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-serif text-xs sm:text-lg font-bold text-luxury-black tracking-tight">
                     {badge.title}
                   </h4>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                  <p className="text-[11px] sm:text-sm text-slate-500 mt-1 leading-relaxed line-clamp-2 sm:line-clamp-none">
                     {badge.description}
                   </p>
                 </div>

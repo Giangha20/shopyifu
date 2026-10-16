@@ -94,8 +94,8 @@ Phương pháp này giúp website chạy trên mạng toàn cầu cả ngày l�
 | `DATABASE_URL` | *(Dán đoạn link Neon bạn đã copy ở Bước 1)* | Kết nối cơ sở dữ liệu |
 | `NEXTAUTH_SECRET` | `YIFU_SHOP_SECRET_SECURITY_KEY_2026` | Mã bảo mật phiên đăng nhập |
 | `NEXTAUTH_URL` | `https://ten-shop-cua-ban.vercel.app` | Đường dẫn trang web của bạn |
-| `ADMIN_EMAIL` | `giangshop@gmail.com` | Email đăng nhập Admin |
-| `ADMIN_PASSWORD` | `GiangShop@2026!` | Mật khẩu đăng nhập Admin |
+| `ADMIN_EMAIL` | `admin@shopquanao.vn` | Email đăng nhập Admin mẫu |
+| `ADMIN_PASSWORD` | `AdminPassword@2026!` | Mật khẩu đăng nhập Admin mẫu |
 
 5. Bấm nút màu xanh **Deploy**.
 6. Chờ khoảng 1–2 phút. Khi màn hình hiện pháo hoa chúc mừng, bạn đã có ngay một đường link website chính thức (ví dụ: `https://ten-shop-cua-ban.vercel.app`) hoạt động 24/7!
@@ -202,8 +202,8 @@ Website có sẵn tính năng tự động gửi email xác nhận cho khách kh
 ### 6.1. Đăng nhập & Quản lý tài khoản
 * **Link đăng nhập**: `https://ten-mien-cua-ban.com/admin/login`
 * **Tài khoản mặc định ban đầu**:
-  * **Email**: `giangshop@gmail.com`
-  * **Mật khẩu**: `GiangShop@2026!`
+  * **Email**: `admin@shopquanao.vn`
+  * **Mật khẩu**: `AdminPassword@2026!`
 
 👉 **Cách đổi mật khẩu quản trị**:
 Vào mục **Nhân viên** (`/admin/nhan-vien`) -> Nhấp vào biểu tượng cây bút ở tài khoản của bạn -> Nhập mật khẩu mới -> Bấm **Lưu**.

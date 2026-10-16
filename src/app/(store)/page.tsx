@@ -995,7 +995,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 10. NEWSLETTER SUBSCRIPTION SECTION */}
+      {/* 10. TRUST BADGES (BOTTOM) */}
+      <TrustBadges className="bg-white border-t border-b border-gray-100" />
+
+      {/* 11. NEWSLETTER SUBSCRIPTION SECTION */}
       <NewsletterSection />
     </div>
   );

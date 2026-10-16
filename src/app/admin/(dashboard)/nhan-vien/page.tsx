@@ -328,7 +328,7 @@ export default function AdminStaffPage() {
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
                   className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-luxury-gold focus:outline-none focus:ring-1 focus:ring-luxury-gold"
-                  placeholder="0977049857"
+                  placeholder="0901234567"
                 />
               </div>
 
