@@ -1,0 +1,81 @@
+================================================================================
+           HƯỚNG DẪN CÀI ĐẶT SOURCE CODE WEBSITE BÁN HÀNG & THUÊ ĐỒ SHOP QUAN AO
+                 (DÙNG ĐỂ COPY VÀO MỤC "HƯỚNG DẪN CÀI ĐẶT" TRÊN TOPCODE)
+================================================================================
+
+📌 MÔI TRƯỜNG YÊU CẦU:
+- Node.js: Phiên bản 18.x hoặc 20.x LTS (Tải miễn phí tại https://nodejs.org)
+- Trình duyệt web: Chrome, CocCoc, Edge, Safari hoặc Firefox
+- Hệ điều hành: Windows, macOS hoặc Linux
+
+--------------------------------------------------------------------------------
+CÁCH 1: CÀI ĐẶT & CHẠY TỰ ĐỘNG BẰNG 2 CLICK CHUỘT (DÀNH CHO WINDOWS)
+--------------------------------------------------------------------------------
+Trong bộ mã nguồn tải về đã được đóng gói sẵn công cụ tự động hóa 1-Click:
+1. Giải nén file nén mã nguồn vào máy tính (Ví dụ: D:\SHOP_QUAN_AO).
+2. Nhấp đúp chuột vào file: 1-CAI-DAT-TU-DONG.bat
+   -> Hệ thống sẽ tự động cài đặt thư viện và nạp toàn bộ cơ sở dữ liệu mẫu.
+3. Nhấp đúp chuột vào file: 2-CHAY-THU-LOCAL.bat
+   -> Website sẽ được khởi chạy tại địa chỉ: http://localhost:3000
+
+--------------------------------------------------------------------------------
+CÁCH 2: CÀI ĐẶT BẰNG DÒNG LỆNH (CHO MỌI HỆ ĐIỀU HÀNH: WINDOWS / MACOS / LINUX)
+--------------------------------------------------------------------------------
+Bước 1: Mở Terminal (Command Prompt / PowerShell / Terminal Mac) tại thư mục dự án.
+
+Bước 2: Cài đặt các gói thư viện cần thiết:
+   npm install
+
+Bước 3: Khởi tạo cơ sở dữ liệu (Database) và nạp dữ liệu mẫu ban đầu:
+   npx prisma db push
+   npx prisma db seed
+
+Bước 4: Khởi chạy môi trường phát triển (Development):
+   npm run dev
+
+Bước 5: Truy cập website trên trình duyệt:
+   - Giao diện bán hàng & thuê đồ: http://localhost:3000
+   - Trang quản trị Admin: http://localhost:3000/admin/login
+
+--------------------------------------------------------------------------------
+🔑 TÀI KHOẢN QUẢN TRỊ ADMIN MẶC ĐỊNH:
+--------------------------------------------------------------------------------
+- Đường dẫn đăng nhập: http://localhost:3000/admin/login
+- Tài khoản Email: admin@shopquanao.vn
+- Mật khẩu: AdminPassword@2026!
+- Trang đăng ký Admin nội bộ: http://localhost:3000/admin/dang-ky
+- Mã bảo mật nội bộ (Admin Secret Key): YIFU@ADMIN2026
+
+--------------------------------------------------------------------------------
+🌐 HƯỚNG DẪN ĐƯA LÊN MẠNG INTERNET 24/7 HOÀN TOÀN MIỄN PHÍ (VERCEL + NEON):
+--------------------------------------------------------------------------------
+1. Tạo Database PostgreSQL miễn phí tại: https://neon.tech
+   - Đăng ký tài khoản -> Bấm "Create Project" -> Sao chép dòng Connection String (DATABASE_URL).
+2. Đẩy source code lên GitHub của bạn.
+3. Đăng nhập https://vercel.com bằng GitHub -> Bấm "Add New Project" -> Chọn Repository dự án.
+4. Tại mục "Environment Variables", thêm các biến sau:
+   - DATABASE_URL = (Dán link Connection String của Neon)
+   - NEXTAUTH_SECRET = YIFU_SHOP_SECRET_SECURITY_KEY_2026
+   - NEXTAUTH_URL = https://ten-shop-cua-ban.vercel.app
+   - ADMIN_EMAIL = admin@shopquanao.vn
+   - ADMIN_PASSWORD = AdminPassword@2026!
+5. Bấm nút "Deploy" -> Sau 1-2 phút website sẽ online 24/7 có sẵn chứng chỉ SSL (HTTPS) miễn phí.
+(Có file HUONG_DAN_CAI_DAT_CHI_TIET.md hướng dẫn gắn tên miền riêng .com, .vn từ A-Z).
+
+--------------------------------------------------------------------------------
+⚙️ HƯỚNG DẪN THAY ĐỔI THÔNG TIN SHOP, LOGO VÀ BẢN QUYỀN:
+--------------------------------------------------------------------------------
+- Bạn không cần phải sửa code! Hãy đăng nhập vào trang Admin -> Vào mục "Cài đặt" (/admin/cai-dat):
+  + Thay đổi Logo shop, Favicon trình duyệt (Tải ảnh lên trực tiếp).
+  + Đổi Tên cửa hàng, Hotline, Địa chỉ, Email liên hệ.
+  + Đổi Số tài khoản ngân hàng nhận tiền thanh toán QR, cấu hình COD, MoMo, VNPay.
+  + Đổi banner trang chủ, quản lý kho hàng nhập qua file Excel/CSV, bật tắt đồ cho thuê.
+
+--------------------------------------------------------------------------------
+🤝 CAM KẾT HỖ TRỢ KỸ THUẬT:
+--------------------------------------------------------------------------------
+- Cam kết mã nguồn sạch 100%, chuẩn Next.js 14 mới nhất, không mã độc, đã test build thành công (exit code 0).
+- Hỗ trợ cài đặt hoàn toàn MIỄN PHÍ qua UltraViewer / AnyDesk / TeamViewer cho đến khi website chạy thành công trên máy hoặc lên mạng.
+- Hỗ trợ giải đáp thắc mắc đồ án, hướng dẫn sinh viên bảo vệ đồ án tốt nghiệp điểm cao.
+- Nếu gặp bất kỳ vấn đề gì trong quá trình cài đặt, vui lòng liên hệ mục chat hỗ trợ của TopCode để được trợ giúp ngay lập tức!
+================================================================================
